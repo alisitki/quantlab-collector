@@ -1,8 +1,10 @@
 .env
 __pycache__/
 *.pyc
-data/
+collector/data/
+collector/__pycache__/
 venv/
+.python-version
 .ipynb_checkpoints/
 *.parquet
 tmp/

@@ -13,6 +13,7 @@ All data is written to Parquet files partitioned by exchange/stream/symbol/date.
 """
 import argparse
 import asyncio
+import os
 import signal
 import sys
 import time
@@ -22,8 +23,9 @@ from binance_handler import binance_ws_task
 from bybit_handler import bybit_ws_task
 from okx_handler import okx_ws_task
 from writer import writer_task
-from state import CollectorState
 from status_api import status_api_task
+from state import CollectorState
+from json_logger import json_log
 
 
 
@@ -55,13 +57,17 @@ class Collector:
         print("=" * 60)
         
         # Create tasks
+        # P2: Log collector start
+        json_log("INFO", "collector_start", details={"symbols": self.symbols or "all"})
+        
         self.tasks = [
-            asyncio.create_task(binance_ws_task(self.queue, self.symbols), name="binance"),
-            asyncio.create_task(bybit_ws_task(self.queue, self.symbols), name="bybit"),
-            asyncio.create_task(okx_ws_task(self.queue, self.symbols), name="okx"),
+            asyncio.create_task(binance_ws_task(self.queue, self.symbols, self.state), name="binance"),
+            asyncio.create_task(bybit_ws_task(self.queue, self.symbols, self.state), name="bybit"),
+            asyncio.create_task(okx_ws_task(self.queue, self.symbols, self.state), name="okx"),
             asyncio.create_task(writer_task(self.queue, state=self.state), name="writer"),
             asyncio.create_task(status_api_task(self.state, self.queue), name="api"),
             asyncio.create_task(self._collector_meta_log(), name="meta"),
+            asyncio.create_task(self._heartbeat_task(), name="heartbeat"),  # P2
         ]
 
         
@@ -70,6 +76,52 @@ class Collector:
             await asyncio.gather(*self.tasks)
         except asyncio.CancelledError:
             pass
+    
+    async def _heartbeat_task(self):
+        """P2: Emit heartbeat every 30s with state and metrics."""
+        import psutil
+        pid = os.getpid()
+        
+        while self.running:
+            await asyncio.sleep(30)
+            
+            # Derive current state
+            ws_connected = {'binance': True, 'bybit': True, 'okx': True}  # Simplified
+            queue_size = self.queue.qsize()
+            queue_max = self.queue.maxsize
+            
+            new_state = self.state.derive_state(
+                ws_connected=ws_connected,
+                writer_alive=True,
+                fatal_error=False,
+                queue_size=queue_size,
+                queue_maxsize=queue_max
+            )
+            
+            # Check for state change
+            if self.state.update_state(new_state):
+                json_log("WARN", "state_change", details={
+                    "new_state": self.state.current_state.value,
+                    "reason": "metrics_threshold"
+                })
+            
+            # Get memory
+            try:
+                rss_mb = psutil.Process(pid).memory_info().rss / 1024 / 1024
+            except:
+                rss_mb = 0
+            
+            # Emit heartbeat
+            json_log("INFO", "heartbeat", details={
+                "state": self.state.current_state.value,
+                "metrics": {
+                    "queue_pct": round(queue_size / queue_max * 100, 1) if queue_max > 0 else 0,
+                    "gaps_1m": self.state.gaps_detected,
+                    "drops_1m": self.state.dropped_events,
+                    "reconnects_5m": sum(self.state.reconnect_counts.values()),
+                    "rss_mb": round(rss_mb, 1)
+                }
+            })
     
     async def _collector_meta_log(self):
         """Print collector meta stats every 10 seconds."""

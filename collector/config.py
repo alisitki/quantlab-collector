@@ -24,11 +24,11 @@ OKX_WS_URL = "wss://ws.okx.com:8443/ws/v5/public"
 
 # Writer settings
 BUFFER_SIZE = 1000
-FLUSH_INTERVAL = 5  # seconds
+FLUSH_INTERVAL = 2  # P1-C: Reduced from 5s to improve throughput and reduce queue saturation
 DATA_DIR = "/opt/quantlab/collectorV2/data"
 
 # Queue settings
-QUEUE_MAXSIZE = 100000
+QUEUE_MAXSIZE = 500000  # P0: Increased from 100K to prevent saturation-triggered reconnects
 
 # Reconnect settings
 RECONNECT_DELAY = 2  # seconds

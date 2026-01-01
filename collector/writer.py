@@ -18,6 +18,7 @@ import pyarrow as pa
 import pyarrow.parquet as pq
 
 from models import Event
+from models import AlignmentEvent
 from schemas import get_schema
 from config import (
     DATA_DIR, BUFFER_SIZE, FLUSH_INTERVAL,
@@ -65,6 +66,18 @@ class ParquetWriter:
         # Buffers keyed by (exchange, stream, symbol)
         self.buffers: Dict[tuple, List[dict]] = defaultdict(list)
         self.last_flush: Dict[tuple, float] = defaultdict(lambda: time.time())
+        
+        # P0: Gap detection - track last ts_event per (exchange, stream, symbol)
+        self.last_ts_event: Dict[tuple, int] = {}
+        
+        # Gap thresholds (milliseconds)
+        self.gap_thresholds = {
+            'bbo': 5000,
+            'trade': 5000,
+            'mark_price': 10000,
+            'funding': 60000,
+            'open_interest': 60000,
+        }
         
         # Stats
         self.total_written = 0
@@ -200,8 +213,52 @@ class ParquetWriter:
             if temp_path and os.path.exists(temp_path):
                 os.remove(temp_path)
     
+    
+    def _check_gap(self, event: Event):
+        """P0: Check for data gaps based on ts_event continuity."""
+        key = (event.exchange, event.stream, event.symbol)
+        
+        if key in self.last_ts_event:
+            last_ts = self.last_ts_event[key]
+            gap = event.ts_event - last_ts
+            threshold = self.gap_thresholds.get(event.stream, 10000)
+            
+            if gap > threshold:
+                print(f"[GAP DETECTED] exchange={event.exchange} stream={event.stream} symbol={event.symbol} gap={gap}ms threshold={threshold}ms")
+                if self.state:
+                    self.state.gaps_detected += 1
+        
+        self.last_ts_event[key] = event.ts_event
+    
+    
+    def _handle_alignment(self, event: AlignmentEvent):
+        """P1-A: Handle alignment event (RAM-only, NOT written to parquet)."""
+        stream_mapping = [
+            ('bbo', event.bbo_ts),
+            ('trade', event.trade_ts),
+            ('mark_price', event.mark_price_ts),
+            ('funding', event.funding_ts),
+            ('open_interest', event.open_interest_ts),
+        ]
+        
+        for stream, ts in stream_mapping:
+            if ts > 0:
+                key = (event.exchange, stream, event.symbol)
+                self.last_ts_event[key] = ts
+                if self.state:
+                    self.state.gap_alignment_corrections += 1
+                    self.state.snapshot_events_seen += 1
+    
     def add_event(self, event: Event):
         """Add an event to the appropriate buffer."""
+        # P1-A: Handle alignment events (RAM-only, not written)
+        if isinstance(event, AlignmentEvent):
+            self._handle_alignment(event)
+            return  # Do NOT write to parquet
+        
+        # P0: Check for gaps
+        self._check_gap(event)
+        
         key = (event.exchange, event.stream, event.symbol)
         self.buffers[key].append(event.to_dict())
         

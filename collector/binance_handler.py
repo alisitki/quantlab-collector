@@ -10,7 +10,7 @@ from typing import Callable
 import websockets
 
 from models import (
-    BBOEvent, TradeEvent, FundingEvent, MarkPriceEvent,
+    BBOEvent, TradeEvent, FundingEvent, MarkPriceEvent, AlignmentEvent,
     StreamType, Exchange
 )
 from config import BINANCE_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY
@@ -33,12 +33,13 @@ def build_streams(symbols: list[str]) -> list[str]:
 
 
 class BinanceHandler:
-    def __init__(self, queue: asyncio.Queue, symbols: list[str] = None):
+    def __init__(self, queue: asyncio.Queue, symbols: list[str] = None, state = None):
         self.queue = queue
         self.symbols = symbols or SYMBOLS
         self.running = False
         self.ws = None
         self.reconnect_delay = RECONNECT_DELAY
+        self.state = state  # P0: For tracking drops/reconnects
         
     async def start(self):
         """Main entry point - starts the WebSocket connection."""
@@ -49,6 +50,8 @@ class BinanceHandler:
                 await self._connect()
             except Exception as e:
                 print(f"[Binance] Connection error: {e}")
+                if self.state:
+                    self.state.reconnect_counts["binance"] += 1
                 await self._handle_reconnect()
     
     async def _connect(self):
@@ -65,8 +68,12 @@ class BinanceHandler:
         
         async with websockets.connect(url, ping_interval=20, ping_timeout=10) as ws:
             self.ws = ws
-            self.reconnect_delay = RECONNECT_DELAY  # Reset on successful connect
+            self.reconnect_delay = RECONNECT_DELAY  # Reset on successful            
             print(f"[Binance] Connected!")
+            self.reconnect_delay = RECONNECT_DELAY
+            
+            # P1-A: Fetch snapshot for gap alignment (RAM-only)
+            await self._align_gap_tracking()
             
             async for msg in ws:
                 if not self.running:
@@ -101,7 +108,12 @@ class BinanceHandler:
             else:
                 return
             
-            await self.queue.put(event)
+            # P0: Non-blocking queue put
+            try:
+                self.queue.put_nowait(event)
+            except asyncio.QueueFull:
+                if self.state:
+                    self.state.dropped_events += 1
             
         except Exception as e:
             print(f"[Binance] Parse error: {e}")
@@ -151,7 +163,12 @@ class BinanceHandler:
             mark_price=float(data["p"]),
             index_price=float(data.get("i", 0)) or None,
         )
-        await self.queue.put(mark_event)
+        # P0: Non-blocking queue put
+        try:
+            self.queue.put_nowait(mark_event)
+        except asyncio.QueueFull:
+            if self.state:
+                self.state.dropped_events += 1
         
         # Funding Rate event (if present)
         if "r" in data and data["r"]:
@@ -164,13 +181,47 @@ class BinanceHandler:
                 funding_rate=float(data["r"]),
                 next_funding_ts=int(data.get("T", 0)),
             )
-            await self.queue.put(funding_event)
+            # P0: Non-blocking queue put
+            try:
+                self.queue.put_nowait(funding_event)
+            except asyncio.QueueFull:
+                if self.state:
+                    self.state.dropped_events += 1
     
     async def _handle_reconnect(self):
         """Handle reconnection with exponential backoff."""
         print(f"[Binance] Reconnecting in {self.reconnect_delay}s...")
         await asyncio.sleep(self.reconnect_delay)
         self.reconnect_delay = min(self.reconnect_delay * 2, MAX_RECONNECT_DELAY)
+    
+    async def _align_gap_tracking(self):
+        """P1-A: Fetch REST snapshot to align gap tracking (RAM-only, not written)."""
+        from rest_snapshot import fetch_binance_snapshot
+        
+        for symbol in self.symbols:
+            try:
+                snapshot = await fetch_binance_snapshot(symbol)
+                if snapshot and self.state:
+                    self.state.snapshot_fetches_total += 1
+                    
+                    # Send alignment event to writer (NOT persisted)
+                    alignment_event = AlignmentEvent(
+                        exchange="binance",
+                        symbol=symbol,
+                        bbo_ts=snapshot.get('bbo_ts', 0),
+                        trade_ts=snapshot.get('trade_ts', 0),
+                        mark_price_ts=snapshot.get('mark_price_ts', 0),
+                        funding_ts=snapshot.get('funding_ts', 0),
+                        open_interest_ts=0
+                    )
+                    
+                    try:
+                        self.queue.put_nowait(alignment_event)
+                        print(f"[Binance] Alignment sent for {symbol}")
+                    except asyncio.QueueFull:
+                        pass
+            except Exception as e:
+                print(f"[Binance] Alignment failed for {symbol}: {e}")
     
     async def stop(self):
         """Stop the handler."""
@@ -179,7 +230,7 @@ class BinanceHandler:
             await self.ws.close()
 
 
-async def binance_ws_task(queue: asyncio.Queue, symbols: list[str] = None):
+async def binance_ws_task(queue: asyncio.Queue, symbols: list[str] = None, state = None):
     """Task wrapper for the Binance handler."""
-    handler = BinanceHandler(queue, symbols)
+    handler = BinanceHandler(queue, symbols, state)
     await handler.start()

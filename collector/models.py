@@ -157,3 +157,22 @@ class MarkPriceEvent:
 
 # Type alias for any event type
 Event = BBOEvent | TradeEvent | OpenInterestEvent | FundingEvent | MarkPriceEvent
+
+
+# P1-A: RAM-only alignment event (NEVER written to parquet)
+@dataclass
+class AlignmentEvent:
+    """
+    RAM-only event used for gap tracking alignment after WS reconnects.
+    Updates last_ts_event in writer without persisting to RAW parquet.
+    
+    CRITICAL: This event is NEVER written to storage.
+    It exists only to synchronize gap detection after reconnects.
+    """
+    exchange: str
+    symbol: str
+    bbo_ts: int = 0
+    trade_ts: int = 0
+    mark_price_ts: int = 0
+    funding_ts: int = 0
+    open_interest_ts: int = 0

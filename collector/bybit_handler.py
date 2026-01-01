@@ -10,7 +10,7 @@ from typing import Optional
 import websockets
 
 from models import (
-    BBOEvent, TradeEvent, OpenInterestEvent, FundingEvent, MarkPriceEvent,
+    BBOEvent, TradeEvent, OpenInterestEvent, FundingEvent, MarkPriceEvent, AlignmentEvent,
     StreamType, Exchange
 )
 from config import BYBIT_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY
@@ -22,12 +22,13 @@ def normalize_symbol(symbol: str) -> str:
 
 
 class BybitHandler:
-    def __init__(self, queue: asyncio.Queue, symbols: list[str] = None):
+    def __init__(self, queue: asyncio.Queue, symbols: list[str] = None, state = None):
         self.queue = queue
         self.symbols = symbols or SYMBOLS
         self.running = False
         self.ws = None
         self.reconnect_delay = RECONNECT_DELAY
+        self.state = state  # P0: For tracking drops/reconnects
         
         # Track last values for delta updates (Bybit uses snapshot/delta)
         self._last_oi: dict[str, float] = {}
@@ -42,6 +43,8 @@ class BybitHandler:
                 await self._connect()
             except Exception as e:
                 print(f"[Bybit] Connection error: {e}")
+                if self.state:
+                    self.state.reconnect_counts["bybit"] += 1
                 await self._handle_reconnect()
     
     async def _connect(self):
@@ -52,6 +55,9 @@ class BybitHandler:
             self.ws = ws
             self.reconnect_delay = RECONNECT_DELAY
             print(f"[Bybit] Connected!")
+            
+            # P1-A: Fetch snapshot for gap alignment (RAM-only)
+            await self._align_gap_tracking()
             
             # Subscribe to streams
             await self._subscribe(ws)
@@ -142,7 +148,12 @@ class BybitHandler:
                 ask_price=float(ask1_price),
                 ask_qty=float(data.get("ask1Size", 0)),
             )
-            await self.queue.put(bbo_event)
+            # P0: Non-blocking queue put
+            try:
+                self.queue.put_nowait(bbo_event)
+            except asyncio.QueueFull:
+                if self.state:
+                    self.state.dropped_events += 1
         
         # Mark Price
         mark_price = data.get("markPrice")
@@ -156,7 +167,12 @@ class BybitHandler:
                 mark_price=float(mark_price),
                 index_price=float(data.get("indexPrice", 0)) or None,
             )
-            await self.queue.put(mark_event)
+            # P0: Non-blocking queue put
+            try:
+                self.queue.put_nowait(mark_event)
+            except asyncio.QueueFull:
+                if self.state:
+                    self.state.dropped_events += 1
         
         # Funding Rate
         funding_rate = data.get("fundingRate")
@@ -174,7 +190,12 @@ class BybitHandler:
                     funding_rate=float(funding_rate),
                     next_funding_ts=int(next_funding),
                 )
-                await self.queue.put(funding_event)
+                # P0: Non-blocking queue put
+                try:
+                    self.queue.put_nowait(funding_event)
+                except asyncio.QueueFull:
+                    if self.state:
+                        self.state.dropped_events += 1
         
         # Open Interest
         open_interest = data.get("openInterest")
@@ -190,7 +211,12 @@ class BybitHandler:
                     stream=StreamType.OPEN_INTEREST.value,
                     open_interest=oi_val,
                 )
-                await self.queue.put(oi_event)
+                # P0: Non-blocking queue put
+                try:
+                    self.queue.put_nowait(oi_event)
+                except asyncio.QueueFull:
+                    if self.state:
+                        self.state.dropped_events += 1
     
     async def _handle_trades(self, data: list, symbol: str, ts_recv: int):
         """Handle publicTrade stream."""
@@ -209,13 +235,43 @@ class BybitHandler:
                 side=side,
                 trade_id=str(trade.get("i", "")),
             )
-            await self.queue.put(event)
+            # P0: Non-blocking queue put
+            try:
+                self.queue.put_nowait(event)
+            except asyncio.QueueFull:
+                if self.state:
+                    self.state.dropped_events += 1
     
     async def _handle_reconnect(self):
         """Handle reconnection with exponential backoff."""
         print(f"[Bybit] Reconnecting in {self.reconnect_delay}s...")
         await asyncio.sleep(self.reconnect_delay)
         self.reconnect_delay = min(self.reconnect_delay * 2, MAX_RECONNECT_DELAY)
+    
+    async def _align_gap_tracking(self):
+        """P1-A: Fetch REST snapshot to align gap tracking (RAM-only)."""
+        from rest_snapshot import fetch_bybit_snapshot
+        
+        for symbol in self.symbols:
+            try:
+                snapshot = await fetch_bybit_snapshot(symbol)
+                if snapshot and self.state:
+                    self.state.snapshot_fetches_total += 1
+                    alignment_event = AlignmentEvent(
+                        exchange="bybit",
+                        symbol=symbol,
+                        bbo_ts=snapshot.get('bbo_ts', 0),
+                        trade_ts=snapshot.get('trade_ts', 0),
+                        mark_price_ts=snapshot.get('mark_price_ts', 0),
+                        funding_ts=snapshot.get('funding_ts', 0),
+                        open_interest_ts=snapshot.get('open_interest_ts', 0)
+                    )
+                    try:
+                        self.queue.put_nowait(alignment_event)
+                    except asyncio.QueueFull:
+                        pass
+            except Exception as e:
+                print(f"[Bybit] Alignment failed for {symbol}: {e}")
     
     async def stop(self):
         """Stop the handler."""
@@ -224,7 +280,7 @@ class BybitHandler:
             await self.ws.close()
 
 
-async def bybit_ws_task(queue: asyncio.Queue, symbols: list[str] = None):
+async def bybit_ws_task(queue: asyncio.Queue, symbols: list[str] = None, state = None):
     """Task wrapper for the Bybit handler."""
-    handler = BybitHandler(queue, symbols)
+    handler = BybitHandler(queue, symbols, state)
     await handler.start()
