@@ -23,8 +23,11 @@ BYBIT_WS_URL = "wss://stream.bybit.com/v5/public/linear"
 OKX_WS_URL = "wss://ws.okx.com:8443/ws/v5/public"
 
 # Writer settings
-BUFFER_SIZE = 1000
-FLUSH_INTERVAL = 2  # P1-C: Reduced from 5s to improve throughput and reduce queue saturation
+# P3: Increased to reduce flush frequency and prevent event loop blocking
+# - BUFFER_SIZE 5000: Collects more events before flushing, reducing S3 call rate
+# - FLUSH_INTERVAL 60s: Prevents flush clustering that caused "Stop-the-World" pauses
+BUFFER_SIZE = 5000
+FLUSH_INTERVAL = 60
 DATA_DIR = "/opt/quantlab/collectorV2/data"
 
 # Queue settings
@@ -47,4 +50,8 @@ S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", "")
 S3_BUCKET = os.getenv("S3_BUCKET", "")
 S3_PREFIX = os.getenv("S3_PREFIX", "")
+
+# API settings
+API_HOST = os.getenv("API_HOST", "0.0.0.0")
+API_PORT = int(os.getenv("API_PORT", "9100"))
 
