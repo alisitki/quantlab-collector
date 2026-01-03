@@ -2,10 +2,14 @@
 Binance Futures WebSocket handler.
 Collects: BBO (bookTicker), Trades (aggTrade), Mark Price + Funding (markPrice@1s)
 Note: Open Interest is NOT available via WebSocket on Binance Futures.
+
+P7: Includes reconnect circuit breaker to prevent reconnect storms.
 """
 import asyncio
 import json
 import time
+import random
+from collections import deque
 from typing import Callable
 import websockets
 
@@ -13,7 +17,11 @@ from models import (
     BBOEvent, TradeEvent, FundingEvent, MarkPriceEvent, AlignmentEvent,
     StreamType, Exchange
 )
-from config import BINANCE_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY
+from config import (
+    BINANCE_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY,
+    RECONNECT_MAX_PER_WINDOW, RECONNECT_WINDOW_SECONDS, RECONNECT_PAUSE_SECONDS,
+)
+from backpressure import enqueue_event
 
 
 def normalize_symbol(symbol: str) -> str:
@@ -40,6 +48,10 @@ class BinanceHandler:
         self.ws = None
         self.reconnect_delay = RECONNECT_DELAY
         self.state = state  # P0: For tracking drops/reconnects
+        
+        # P7: Circuit breaker state
+        self._reconnect_timestamps: deque = deque()  # Track recent reconnects
+        self._circuit_breaker_until: float = 0       # Pause reconnects until this time
         
     async def start(self):
         """Main entry point - starts the WebSocket connection."""
@@ -108,12 +120,8 @@ class BinanceHandler:
             else:
                 return
             
-            # P0: Non-blocking queue put
-            try:
-                self.queue.put_nowait(event)
-            except asyncio.QueueFull:
-                if self.state:
-                    self.state.dropped_events += 1
+            # Backpressure-aware queue put
+            await enqueue_event(self.queue, event, self.state, event.stream)
             
         except Exception as e:
             print(f"[Binance] Parse error: {e}")
@@ -163,12 +171,8 @@ class BinanceHandler:
             mark_price=float(data["p"]),
             index_price=float(data.get("i", 0)) or None,
         )
-        # P0: Non-blocking queue put
-        try:
-            self.queue.put_nowait(mark_event)
-        except asyncio.QueueFull:
-            if self.state:
-                self.state.dropped_events += 1
+        # Backpressure-aware queue put
+        await enqueue_event(self.queue, mark_event, self.state, mark_event.stream)
         
         # Funding Rate event (if present)
         if "r" in data and data["r"]:
@@ -181,17 +185,48 @@ class BinanceHandler:
                 funding_rate=float(data["r"]),
                 next_funding_ts=int(data.get("T", 0)),
             )
-            # P0: Non-blocking queue put
-            try:
-                self.queue.put_nowait(funding_event)
-            except asyncio.QueueFull:
-                if self.state:
-                    self.state.dropped_events += 1
+            # Backpressure-aware queue put
+            await enqueue_event(self.queue, funding_event, self.state, funding_event.stream)
     
     async def _handle_reconnect(self):
-        """Handle reconnection with exponential backoff."""
-        print(f"[Binance] Reconnecting in {self.reconnect_delay}s...")
-        await asyncio.sleep(self.reconnect_delay)
+        """
+        Handle reconnection with exponential backoff, jitter, and circuit breaker.
+        
+        P7: Circuit breaker trips after RECONNECT_MAX_PER_WINDOW reconnects
+        within RECONNECT_WINDOW_SECONDS, pausing for RECONNECT_PAUSE_SECONDS.
+        """
+        now = time.time()
+        
+        # Check if circuit breaker is active
+        if now < self._circuit_breaker_until:
+            remaining = self._circuit_breaker_until - now
+            print(f"[Binance] Circuit breaker active, waiting {remaining:.0f}s...")
+            await asyncio.sleep(remaining)
+            return
+        
+        # Track this reconnect attempt
+        self._reconnect_timestamps.append(now)
+        
+        # Evict old timestamps outside window
+        cutoff = now - RECONNECT_WINDOW_SECONDS
+        while self._reconnect_timestamps and self._reconnect_timestamps[0] < cutoff:
+            self._reconnect_timestamps.popleft()
+        
+        # Check if circuit breaker should trip
+        if len(self._reconnect_timestamps) >= RECONNECT_MAX_PER_WINDOW:
+            print(f"[Binance] Circuit breaker TRIPPED: {len(self._reconnect_timestamps)} reconnects in {RECONNECT_WINDOW_SECONDS}s, pausing {RECONNECT_PAUSE_SECONDS}s")
+            self._circuit_breaker_until = now + RECONNECT_PAUSE_SECONDS
+            self._reconnect_timestamps.clear()
+            await asyncio.sleep(RECONNECT_PAUSE_SECONDS)
+            self.reconnect_delay = RECONNECT_DELAY  # Reset backoff after pause
+            return
+        
+        # Apply jitter: delay * (0.5 + random 0-1)
+        jittered_delay = self.reconnect_delay * (0.5 + random.random())
+        print(f"[Binance] Reconnecting in {jittered_delay:.1f}s...")
+        await asyncio.sleep(jittered_delay)
+        
+        # Exponential backoff for next attempt
         self.reconnect_delay = min(self.reconnect_delay * 2, MAX_RECONNECT_DELAY)
     
     async def _align_gap_tracking(self):

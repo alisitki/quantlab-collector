@@ -9,3 +9,7 @@ venv/
 *.parquet
 tmp/
 /tmp/collector
+quality/
+data/
+*.tmp
+logs/

@@ -2,10 +2,14 @@
 Bybit v5 WebSocket handler.
 Collects: BBO, Trades, Open Interest, Funding Rate, Mark Price from unified streams.
 Uses: tickers.{symbol} for BBO + Funding + Mark Price + OI, publicTrade.{symbol} for trades
+
+P7: Includes reconnect circuit breaker to prevent reconnect storms.
 """
 import asyncio
 import json
 import time
+import random
+from collections import deque
 from typing import Optional
 import websockets
 
@@ -13,7 +17,11 @@ from models import (
     BBOEvent, TradeEvent, OpenInterestEvent, FundingEvent, MarkPriceEvent, AlignmentEvent,
     StreamType, Exchange
 )
-from config import BYBIT_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY
+from config import (
+    BYBIT_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY,
+    RECONNECT_MAX_PER_WINDOW, RECONNECT_WINDOW_SECONDS, RECONNECT_PAUSE_SECONDS,
+)
+from backpressure import enqueue_event
 
 
 def normalize_symbol(symbol: str) -> str:
@@ -33,6 +41,10 @@ class BybitHandler:
         # Track last values for delta updates (Bybit uses snapshot/delta)
         self._last_oi: dict[str, float] = {}
         self._last_funding: dict[str, tuple] = {}  # (rate, next_ts)
+        
+        # P7: Circuit breaker state
+        self._reconnect_timestamps: deque = deque()
+        self._circuit_breaker_until: float = 0
         
     async def start(self):
         """Main entry point - starts the WebSocket connection."""
@@ -148,12 +160,8 @@ class BybitHandler:
                 ask_price=float(ask1_price),
                 ask_qty=float(data.get("ask1Size", 0)),
             )
-            # P0: Non-blocking queue put
-            try:
-                self.queue.put_nowait(bbo_event)
-            except asyncio.QueueFull:
-                if self.state:
-                    self.state.dropped_events += 1
+            # Backpressure-aware queue put
+            await enqueue_event(self.queue, bbo_event, self.state, bbo_event.stream)
         
         # Mark Price
         mark_price = data.get("markPrice")
@@ -167,12 +175,8 @@ class BybitHandler:
                 mark_price=float(mark_price),
                 index_price=float(data.get("indexPrice", 0)) or None,
             )
-            # P0: Non-blocking queue put
-            try:
-                self.queue.put_nowait(mark_event)
-            except asyncio.QueueFull:
-                if self.state:
-                    self.state.dropped_events += 1
+            # Backpressure-aware queue put
+            await enqueue_event(self.queue, mark_event, self.state, mark_event.stream)
         
         # Funding Rate
         funding_rate = data.get("fundingRate")
@@ -190,12 +194,8 @@ class BybitHandler:
                     funding_rate=float(funding_rate),
                     next_funding_ts=int(next_funding),
                 )
-                # P0: Non-blocking queue put
-                try:
-                    self.queue.put_nowait(funding_event)
-                except asyncio.QueueFull:
-                    if self.state:
-                        self.state.dropped_events += 1
+                # Backpressure-aware queue put
+                await enqueue_event(self.queue, funding_event, self.state, funding_event.stream)
         
         # Open Interest
         open_interest = data.get("openInterest")
@@ -211,12 +211,8 @@ class BybitHandler:
                     stream=StreamType.OPEN_INTEREST.value,
                     open_interest=oi_val,
                 )
-                # P0: Non-blocking queue put
-                try:
-                    self.queue.put_nowait(oi_event)
-                except asyncio.QueueFull:
-                    if self.state:
-                        self.state.dropped_events += 1
+                # Backpressure-aware queue put
+                await enqueue_event(self.queue, oi_event, self.state, oi_event.stream)
     
     async def _handle_trades(self, data: list, symbol: str, ts_recv: int):
         """Handle publicTrade stream."""
@@ -235,17 +231,35 @@ class BybitHandler:
                 side=side,
                 trade_id=str(trade.get("i", "")),
             )
-            # P0: Non-blocking queue put
-            try:
-                self.queue.put_nowait(event)
-            except asyncio.QueueFull:
-                if self.state:
-                    self.state.dropped_events += 1
+            # Backpressure-aware queue put
+            await enqueue_event(self.queue, event, self.state, event.stream)
     
     async def _handle_reconnect(self):
-        """Handle reconnection with exponential backoff."""
-        print(f"[Bybit] Reconnecting in {self.reconnect_delay}s...")
-        await asyncio.sleep(self.reconnect_delay)
+        """Handle reconnection with exponential backoff, jitter, and circuit breaker."""
+        now = time.time()
+        
+        if now < self._circuit_breaker_until:
+            remaining = self._circuit_breaker_until - now
+            print(f"[Bybit] Circuit breaker active, waiting {remaining:.0f}s...")
+            await asyncio.sleep(remaining)
+            return
+        
+        self._reconnect_timestamps.append(now)
+        cutoff = now - RECONNECT_WINDOW_SECONDS
+        while self._reconnect_timestamps and self._reconnect_timestamps[0] < cutoff:
+            self._reconnect_timestamps.popleft()
+        
+        if len(self._reconnect_timestamps) >= RECONNECT_MAX_PER_WINDOW:
+            print(f"[Bybit] Circuit breaker TRIPPED: {len(self._reconnect_timestamps)} reconnects in {RECONNECT_WINDOW_SECONDS}s, pausing {RECONNECT_PAUSE_SECONDS}s")
+            self._circuit_breaker_until = now + RECONNECT_PAUSE_SECONDS
+            self._reconnect_timestamps.clear()
+            await asyncio.sleep(RECONNECT_PAUSE_SECONDS)
+            self.reconnect_delay = RECONNECT_DELAY
+            return
+        
+        jittered_delay = self.reconnect_delay * (0.5 + random.random())
+        print(f"[Bybit] Reconnecting in {jittered_delay:.1f}s...")
+        await asyncio.sleep(jittered_delay)
         self.reconnect_delay = min(self.reconnect_delay * 2, MAX_RECONNECT_DELAY)
     
     async def _align_gap_tracking(self):

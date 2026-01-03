@@ -27,7 +27,11 @@ from models import AlignmentEvent
 from schemas import get_schema
 from config import (
     DATA_DIR, BUFFER_SIZE, FLUSH_INTERVAL,
-    STORAGE_BACKEND, S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET, S3_PREFIX
+    STORAGE_BACKEND, S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET, S3_PREFIX,
+    SILENCE_THRESHOLDS_MS,
+    DRAIN_ACCELERATION_ENTER_PCT, DRAIN_ACCELERATION_EXIT_PCT,
+    DRAIN_NORMAL_FLUSH_GAP, DRAIN_ACCELERATED_FLUSH_GAP,
+    SUSTAINED_GROWTH_WARN_THRESHOLD, SUSTAINED_GROWTH_WARN_SECONDS,
 )
 from state import CollectorState
 
@@ -45,16 +49,30 @@ _s3_client = None
 
 
 def _get_s3_client():
-    """Get or create S3 client (lazy initialization)."""
+    """Get or create S3 client (lazy initialization).
+    
+    P8 HARDENING: Explicit timeouts prevent indefinite thread blocking.
+    - connect_timeout: 10s for initial connection
+    - read_timeout: 30s for upload completion
+    - retries: 2 attempts before failing
+    """
     global _s3_client
     if _s3_client is None:
         import boto3
+        from botocore.config import Config
+        
         _s3_client = boto3.client(
             "s3",
             endpoint_url=S3_ENDPOINT,
             aws_access_key_id=S3_ACCESS_KEY,
             aws_secret_access_key=S3_SECRET_KEY,
+            config=Config(
+                connect_timeout=10,
+                read_timeout=30,
+                retries={"max_attempts": 2}
+            )
         )
+        print("[Writer] S3 client initialized with timeout config: connect=10s, read=30s, retries=2")
     return _s3_client
 
 
@@ -112,17 +130,8 @@ class ParquetWriter:
         # P3 HARDENING FIX 5: Failure tracking
         self.upload_failures = 0
         
-        # P0: Gap detection - track last ts_event per (exchange, stream, symbol)
+        # Silence detection - track last ts_event per (exchange, stream, symbol)
         self.last_ts_event: Dict[tuple, int] = {}
-        
-        # Gap thresholds (milliseconds)
-        self.gap_thresholds = {
-            'bbo': 5000,
-            'trade': 5000,
-            'mark_price': 10000,
-            'funding': 60000,
-            'open_interest': 60000,
-        }
     
     def _get_flush_sem(self) -> asyncio.Semaphore:
         """Get or create flush semaphore (must be called from async context)."""
@@ -137,13 +146,16 @@ class ParquetWriter:
             self.flush_stagger_offsets[key] = random.uniform(0, self.flush_interval / 2)
         return self.flush_stagger_offsets[key]
     
-    def _can_flush_buffer(self, key: tuple, now: float) -> tuple[bool, str]:
+    def _can_flush_buffer(self, key: tuple, now: float, min_flush_gap: float = None) -> tuple[bool, str]:
         """
         Check if buffer can be flushed. Returns (can_flush, reason).
         
         P3 HARDENING FIX 4: Enforces minimum flush gap to prevent hot-stream flush storms.
-        A hot stream (e.g., BTCUSDT BBO) could otherwise flush back-to-back under load.
+        P7 ADAPTIVE DRAIN: min_flush_gap can be reduced dynamically when queue is filling.
         """
+        if min_flush_gap is None:
+            min_flush_gap = MIN_FLUSH_GAP_SECONDS
+        
         buffer = self.buffers.get(key, [])
         if not buffer:
             return False, "empty"
@@ -152,7 +164,7 @@ class ParquetWriter:
         
         # Size-based flush (high priority, but still respect minimum gap)
         if len(buffer) >= self.buffer_size:
-            if elapsed >= MIN_FLUSH_GAP_SECONDS:
+            if elapsed >= min_flush_gap:
                 return True, "size"
             return False, "min_gap"
         
@@ -396,19 +408,30 @@ class ParquetWriter:
         path = self._get_partition_path(exchange, stream, symbol)
         pq.write_table(table, path)
     
-    def _check_gap(self, event: Event):
-        """P0: Check for data gaps based on ts_event continuity."""
+    def _check_silence(self, event: Event):
+        """
+        Check for inter-event silence (time gap) based on ts_event continuity.
+        
+        NOTE: This is NOT sequence gap detection. It detects periods where no events
+        arrive for a stream, which may indicate stale data (but NOT data loss).
+        Streams with None threshold in SILENCE_THRESHOLDS_MS are not monitored.
+        """
+        # Get threshold from config (None = disabled)
+        threshold = SILENCE_THRESHOLDS_MS.get(event.stream)
+        if threshold is None:
+            # Stream not monitored (e.g., trade, bbo - variable frequency)
+            return
+        
         key = (event.exchange, event.stream, event.symbol)
         
         if key in self.last_ts_event:
             last_ts = self.last_ts_event[key]
-            gap = event.ts_event - last_ts
-            threshold = self.gap_thresholds.get(event.stream, 10000)
+            silence_ms = event.ts_event - last_ts
             
-            if gap > threshold:
-                print(f"[GAP DETECTED] exchange={event.exchange} stream={event.stream} symbol={event.symbol} gap={gap}ms threshold={threshold}ms")
+            if silence_ms > threshold:
+                print(f"[SILENCE] exchange={event.exchange} stream={event.stream} symbol={event.symbol} silence={silence_ms}ms threshold={threshold}ms")
                 if self.state:
-                    self.state.gaps_detected += 1
+                    self.state.record_silence_interval(key)
         
         self.last_ts_event[key] = event.ts_event
     
@@ -437,15 +460,15 @@ class ParquetWriter:
             self._handle_alignment(event)
             return  # Do NOT write to parquet
         
-        # P0: Check for gaps
-        self._check_gap(event)
+        # Check for inter-event silence (only for monitored streams)
+        self._check_silence(event)
         
         key = (event.exchange, event.stream, event.symbol)
         self.buffers[key].append(event.to_dict())
         
-        # Update shared state
         if self.state:
-            self.state.update_event(event.stream)
+            # P10: update_event moved to backpressure.py (enqueue_event) for truthfulness
+            pass
         
         # NOTE: Flush is handled by writer_task, not here (prevents blocking)
     
@@ -498,8 +521,20 @@ async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
     - S3 uploads run in ThreadPoolExecutor, never blocking the event loop
     - Staggered flush scheduling + min flush gap prevents flush bursts
     - Explicit exception handling ensures no silent data loss
+    
+    P7 Adaptive Drain:
+    - Monitors queue utilization and switches between normal/accelerated modes
+    - Accelerated mode reduces min_flush_gap from 5s to 1s (5x faster drain)
+    - Hysteresis: enter at 50%, exit at 40% (prevents oscillation)
     """
     writer = ParquetWriter(state=state)
+    
+    # P7: Track drain mode locally (also synced to state for API exposure)
+    drain_mode = "normal"  # "normal" or "accelerated"
+    
+    # P7: Guardrail tracking
+    last_drain_count = 0
+    last_rate_check = time.time()
     
     # Startup logging
     if writer.backend == "s3":
@@ -508,7 +543,8 @@ async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
         print(f"[Writer] Endpoint: {S3_ENDPOINT}")
         print(f"[Writer] Prefix: {writer.s3_prefix}")
         print(f"[Writer] Buffer size: {writer.buffer_size}, Flush interval: {writer.flush_interval}s")
-        print(f"[Writer] Max in-flight: {MAX_IN_FLIGHT_UPLOADS}, Min flush gap: {MIN_FLUSH_GAP_SECONDS}s")
+        print(f"[Writer] Max in-flight: {MAX_IN_FLIGHT_UPLOADS}, Flush gap: {DRAIN_NORMAL_FLUSH_GAP}s (normal) / {DRAIN_ACCELERATED_FLUSH_GAP}s (accelerated)")
+        print(f"[Writer] Adaptive drain thresholds: enter={DRAIN_ACCELERATION_ENTER_PCT}%, exit={DRAIN_ACCELERATION_EXIT_PCT}%")
     else:
         print(f"[Writer] Backend: Local")
         print(f"[Writer] Path: {writer.data_dir}")
@@ -525,12 +561,34 @@ async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
             except asyncio.TimeoutError:
                 pass
             
-            # Check for buffers ready to flush
             now = time.time()
+            
+            # P7: Calculate queue utilization and determine drain mode
+            queue_size = queue.qsize()
+            queue_max = queue.maxsize
+            queue_util = (queue_size / queue_max * 100) if queue_max > 0 else 0
+            
+            # P7: Adaptive drain mode switching with hysteresis
+            old_mode = drain_mode
+            if drain_mode == "normal" and queue_util >= DRAIN_ACCELERATION_ENTER_PCT:
+                drain_mode = "accelerated"
+            elif drain_mode == "accelerated" and queue_util < DRAIN_ACCELERATION_EXIT_PCT:
+                drain_mode = "normal"
+            
+            # Log mode transitions
+            if old_mode != drain_mode:
+                print(f"[Writer] Drain mode -> {drain_mode.upper()} (queue={queue_util:.0f}%)")
+                if state:
+                    state.drain_mode = drain_mode
+            
+            # P7: Determine min_flush_gap based on drain mode
+            min_flush_gap = DRAIN_ACCELERATED_FLUSH_GAP if drain_mode == "accelerated" else DRAIN_NORMAL_FLUSH_GAP
+            
+            # Check for buffers ready to flush (with adaptive flush gap)
             flush_tasks = []
             
             for key in list(writer.buffers.keys()):
-                can_flush, reason = writer._can_flush_buffer(key, now)
+                can_flush, reason = writer._can_flush_buffer(key, now, min_flush_gap)
                 if can_flush:
                     flush_tasks.append(writer._flush_buffer_async(key))
             
@@ -544,9 +602,36 @@ async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
                         print(f"[Writer] UNEXPECTED ERROR in flush task {i}: {result}")
                         writer.upload_failures += 1
             
-            # Print stats every 30 seconds
+            # P7: Update guardrail metrics every 10 seconds
+            rate_elapsed = now - last_rate_check
+            if rate_elapsed >= 10 and state:
+                # Calculate drain rate (events written per second)
+                drain_delta = writer.total_written - last_drain_count
+                state.drain_rate = round(drain_delta / rate_elapsed, 1)
+                last_drain_count = writer.total_written
+                
+                # Ingestion rate is already in state.eps (sum of all streams)
+                state.ingestion_rate = sum(state.eps.values())
+                
+                # Queue growth rate
+                state.queue_growth_rate = round(state.ingestion_rate - state.drain_rate, 1)
+                
+                # P7: Sustained growth warning
+                if state.queue_growth_rate > SUSTAINED_GROWTH_WARN_THRESHOLD:
+                    if state._growth_warning_start == 0:
+                        state._growth_warning_start = now
+                    elif now - state._growth_warning_start >= SUSTAINED_GROWTH_WARN_SECONDS:
+                        print(f"[Writer] WARNING: Sustained queue growth {state.queue_growth_rate:.0f} ev/s for {now - state._growth_warning_start:.0f}s")
+                        state._growth_warning_start = now  # Reset to avoid spam
+                else:
+                    state._growth_warning_start = 0
+                
+                last_rate_check = now
+            
+            # Print stats every 30 seconds (include drain_mode)
             if now - last_stats_time >= 30:
                 stats = writer.get_stats()
+                stats["drain_mode"] = drain_mode
                 print(f"[Writer] Stats: {stats}")
                 last_stats_time = now
                 

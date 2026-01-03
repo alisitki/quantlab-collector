@@ -72,9 +72,12 @@ async def fetch_okx_snapshot(symbol: str) -> Optional[Dict[str, int]]:
     Fetch latest timestamps from OKX REST APIs.
     OKX symbol format: BTC-USDT-SWAP
     """
-    # Convert BTCUSDT to BTC-USDT-SWAP
+    # Convert BTCUSDT to BTC-USDT-SWAP with exceptions
     if symbol.endswith('USDT'):
         base = symbol[:-4]
+        # P10: OKX Rebranding exception
+        if base == "MATIC":
+            base = "POL"
         okx_symbol = f"{base}-USDT-SWAP"
     else:
         return None

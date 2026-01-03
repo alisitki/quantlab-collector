@@ -6,10 +6,14 @@ Collects all 5 streams via dedicated channels:
 - open-interest: Open Interest
 - funding-rate: Funding Rate
 - mark-price: Mark Price
+
+P7: Includes reconnect circuit breaker to prevent reconnect storms.
 """
 import asyncio
 import json
 import time
+import random
+from collections import deque
 from typing import Optional
 import websockets
 
@@ -17,22 +21,31 @@ from models import (
     BBOEvent, TradeEvent, OpenInterestEvent, FundingEvent, MarkPriceEvent, AlignmentEvent,
     StreamType, Exchange
 )
-from config import OKX_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY
+from config import (
+    OKX_WS_URL, SYMBOLS, RECONNECT_DELAY, MAX_RECONNECT_DELAY,
+    RECONNECT_MAX_PER_WINDOW, RECONNECT_WINDOW_SECONDS, RECONNECT_PAUSE_SECONDS,
+)
+from backpressure import enqueue_event
 
 
 def to_okx_symbol(symbol: str) -> str:
-    """Convert BTCUSDT to BTC-USDT-SWAP format."""
-    # Remove USDT suffix and add -USDT-SWAP
+    """Convert BTCUSDT to BTC-USDT-SWAP format with exceptions (e.g. MATIC -> POL)."""
     base = symbol.replace("USDT", "")
+    # P10: Rebranding exceptions
+    if base == "MATIC":
+        base = "POL"
     return f"{base}-USDT-SWAP"
 
 
 def from_okx_symbol(inst_id: str) -> str:
-    """Convert BTC-USDT-SWAP to BTCUSDT format."""
-    # BTC-USDT-SWAP -> BTCUSDT
+    """Convert BTC-USDT-SWAP to BTCUSDT format with exceptions."""
     parts = inst_id.split("-")
     if len(parts) >= 2:
-        return f"{parts[0]}{parts[1]}"
+        base = parts[0]
+        # P10: Rebranding back-mapping
+        if base == "POL":
+            base = "MATIC"
+        return f"{base}{parts[1]}"
     return inst_id
 
 
@@ -44,6 +57,10 @@ class OKXHandler:
         self.ws = None
         self.reconnect_delay = RECONNECT_DELAY
         self.state = state  # P0: For tracking drops/reconnects
+        
+        # P7: Circuit breaker state
+        self._reconnect_timestamps: deque = deque()
+        self._circuit_breaker_until: float = 0
         
     async def start(self):
         """Main entry point - starts the WebSocket connection."""
@@ -148,12 +165,8 @@ class OKXHandler:
                     continue
                 
                 if event:
-                    # P0: Non-blocking queue put
-                    try:
-                        self.queue.put_nowait(event)
-                    except asyncio.QueueFull:
-                        if self.state:
-                            self.state.dropped_events += 1
+                    # Backpressure-aware queue put
+                    await enqueue_event(self.queue, event, self.state, event.stream)
                     
         except Exception as e:
             print(f"[OKX] Parse error: {e}")
@@ -224,9 +237,31 @@ class OKXHandler:
         )
     
     async def _handle_reconnect(self):
-        """Handle reconnection with exponential backoff."""
-        print(f"[OKX] Reconnecting in {self.reconnect_delay}s...")
-        await asyncio.sleep(self.reconnect_delay)
+        """Handle reconnection with exponential backoff, jitter, and circuit breaker."""
+        now = time.time()
+        
+        if now < self._circuit_breaker_until:
+            remaining = self._circuit_breaker_until - now
+            print(f"[OKX] Circuit breaker active, waiting {remaining:.0f}s...")
+            await asyncio.sleep(remaining)
+            return
+        
+        self._reconnect_timestamps.append(now)
+        cutoff = now - RECONNECT_WINDOW_SECONDS
+        while self._reconnect_timestamps and self._reconnect_timestamps[0] < cutoff:
+            self._reconnect_timestamps.popleft()
+        
+        if len(self._reconnect_timestamps) >= RECONNECT_MAX_PER_WINDOW:
+            print(f"[OKX] Circuit breaker TRIPPED: {len(self._reconnect_timestamps)} reconnects in {RECONNECT_WINDOW_SECONDS}s, pausing {RECONNECT_PAUSE_SECONDS}s")
+            self._circuit_breaker_until = now + RECONNECT_PAUSE_SECONDS
+            self._reconnect_timestamps.clear()
+            await asyncio.sleep(RECONNECT_PAUSE_SECONDS)
+            self.reconnect_delay = RECONNECT_DELAY
+            return
+        
+        jittered_delay = self.reconnect_delay * (0.5 + random.random())
+        print(f"[OKX] Reconnecting in {jittered_delay:.1f}s...")
+        await asyncio.sleep(jittered_delay)
         self.reconnect_delay = min(self.reconnect_delay * 2, MAX_RECONNECT_DELAY)
     
     async def _align_gap_tracking(self):
