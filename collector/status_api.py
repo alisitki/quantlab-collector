@@ -35,6 +35,7 @@ class StatusAPI:
         self.app.router.add_get("/collector/meta", self.handle_collector_meta)
         self.app.router.add_get("/collector/day/{date}/summary", self.handle_day_summary)
         self.app.router.add_get("/collector/day/{date}/windows", self.handle_day_windows)
+        self.app.router.add_get("/collector/uploader/now", self.handle_uploader_now)
         
         self.runner = None
 
@@ -299,6 +300,69 @@ class StatusAPI:
             })
             
         return web.json_response(drilldown)
+
+    async def handle_uploader_now(self, request):
+        """GET /collector/uploader/now - Async uploader status (S3 sync health)."""
+        import json
+        import glob
+        from config import SPOOL_DIR
+        
+        state_file = "/var/lib/quantlab/uploader_state.json"
+        now = time.time()
+        
+        # 1. Read uploader state
+        state_data = {}
+        if os.path.exists(state_file):
+            try:
+                with open(state_file, "r") as f:
+                    state_data = json.load(f)
+            except:
+                pass
+        
+        if not state_data:
+            return web.json_response({
+                "state": "ERROR",
+                "last_success_upload_utc": None,
+                "seconds_since_last_success": None,
+                "pending_files": 0,
+                "spool_size_gb": 0,
+                "alert_sent_24h": False
+            })
+            
+        last_success_ts = state_data.get("last_success_ts", 0)
+        seconds_since = int(now - last_success_ts)
+        
+        # 2. Determine state
+        if seconds_since < 3600:
+            status = "READY"
+        elif seconds_since < 86400:
+            status = "DEGRADED"
+        else:
+            status = "BAD"
+            
+        # 3. Calculate spool metrics
+        pending_files = 0
+        total_size_bytes = 0
+        try:
+            for dirpath, dirnames, filenames in os.walk(SPOOL_DIR):
+                for f in filenames:
+                    if f.endswith(".parquet") and not f.endswith(".tmp"):
+                        pending_files += 1
+                        fp = os.path.join(dirpath, f)
+                        total_size_bytes += os.path.getsize(fp)
+        except:
+            pass
+            
+        spool_size_gb = round(total_size_bytes / (1024**3), 2)
+        
+        return web.json_response({
+            "state": status,
+            "last_success_upload_utc": datetime.fromtimestamp(last_success_ts, timezone.utc).isoformat().replace("+00:00", "Z"),
+            "seconds_since_last_success": seconds_since,
+            "pending_files": pending_files,
+            "spool_size_gb": spool_size_gb,
+            "alert_sent_24h": state_data.get("alert_sent", False)
+        })
 
     async def start(self, host='127.0.0.1', port=9100):
         self.runner = web.AppRunner(self.app)

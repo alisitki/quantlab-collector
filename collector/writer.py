@@ -1,18 +1,20 @@
 """
-Parquet writer task.
+Parquet writer task - LOCAL-FIRST ARCHITECTURE.
 Single writer consuming from queue, partitioned storage by exchange/stream/symbol/date.
-Supports both local filesystem and S3-compatible object storage.
 
-P3 FIX: Uses ThreadPoolExecutor for S3 uploads to prevent event loop blocking.
-P3 HARDENING: Production-grade concurrency control, lifecycle management, and error handling.
+P11 REFACTOR: Removed all S3 code. Collector now writes to local spool only.
+Uploader (separate service) is responsible for S3 upload.
+
+Key behaviors:
+- Writes to SPOOL_DIR with fsync for durability
+- Atomic write: .tmp → rename
+- On write failure: buffer PRESERVED (retry next flush)
+- NEVER restores to queue (no DROP risk from writer)
+- NEVER deletes files (uploader responsibility)
 """
 import asyncio
 import os
 import time
-import uuid
-import random
-import tempfile
-import shutil
 from datetime import datetime, timezone
 from collections import defaultdict
 from typing import Dict, List, Optional
@@ -26,132 +28,72 @@ from models import Event
 from models import AlignmentEvent
 from schemas import get_schema
 from config import (
-    DATA_DIR, BUFFER_SIZE, FLUSH_INTERVAL,
-    STORAGE_BACKEND, S3_ENDPOINT, S3_ACCESS_KEY, S3_SECRET_KEY, S3_BUCKET, S3_PREFIX,
+    DATA_DIR, SPOOL_DIR, STORAGE_BACKEND,
     SILENCE_THRESHOLDS_MS,
     DRAIN_ACCELERATION_ENTER_PCT, DRAIN_ACCELERATION_EXIT_PCT,
     DRAIN_NORMAL_FLUSH_GAP, DRAIN_ACCELERATED_FLUSH_GAP,
     SUSTAINED_GROWTH_WARN_THRESHOLD, SUSTAINED_GROWTH_WARN_SECONDS,
+    MAX_PARQUET_MB, MAX_FLUSH_SEC,
 )
 from state import CollectorState
 
 
 # ============================================================================
-# P3 HARDENING: Configuration Constants
+# Configuration Constants
 # ============================================================================
-MAX_UPLOAD_WORKERS = 8          # ThreadPoolExecutor max workers
-MAX_IN_FLIGHT_UPLOADS = 16      # Semaphore limit for concurrent flushes
 MIN_FLUSH_GAP_SECONDS = 5       # Minimum time between flushes of same buffer
-
-
-# Lazy import boto3 only when needed
-_s3_client = None
-
-
-def _get_s3_client():
-    """Get or create S3 client (lazy initialization).
-    
-    P8 HARDENING: Explicit timeouts prevent indefinite thread blocking.
-    - connect_timeout: 10s for initial connection
-    - read_timeout: 30s for upload completion
-    - retries: 2 attempts before failing
-    """
-    global _s3_client
-    if _s3_client is None:
-        import boto3
-        from botocore.config import Config
-        
-        _s3_client = boto3.client(
-            "s3",
-            endpoint_url=S3_ENDPOINT,
-            aws_access_key_id=S3_ACCESS_KEY,
-            aws_secret_access_key=S3_SECRET_KEY,
-            config=Config(
-                connect_timeout=10,
-                read_timeout=30,
-                retries={"max_attempts": 2}
-            )
-        )
-        print("[Writer] S3 client initialized with timeout config: connect=10s, read=30s, retries=2")
-    return _s3_client
 
 
 class ParquetWriter:
     """
-    Parquet writer with async S3 support and production hardening.
+    Parquet writer with LOCAL-FIRST architecture.
     
-    P3 Architecture:
-    - Synchronous operations (DataFrame conversion, Parquet serialization) run inline
-    - S3 uploads are offloaded to ThreadPoolExecutor via run_in_executor
-    - Bounded concurrency via asyncio.Semaphore (MAX_IN_FLIGHT_UPLOADS)
-    - Explicit exception handling with failure metrics
-    - Per-buffer minimum flush gap prevents hot-stream flush storms
+    P11 Architecture:
+    - ALL writes go to local spool directory
+    - fsync ensures durability before buffer clear
+    - Atomic rename prevents partial files
+    - NO S3 knowledge - uploader handles that
+    - NO buffer restore to queue - eliminates DROP risk from writer
     """
     
-    def __init__(self, data_dir: str = None, buffer_size: int = None, flush_interval: int = None, state: CollectorState = None):
+    def __init__(self, data_dir: str = None, state: CollectorState = None):
         self.data_dir = data_dir or DATA_DIR
-        self.buffer_size = buffer_size or BUFFER_SIZE
-        self.flush_interval = flush_interval or FLUSH_INTERVAL
+        self.max_parquet_mb = MAX_PARQUET_MB
+        self.max_flush_sec = MAX_FLUSH_SEC
         self.backend = STORAGE_BACKEND
         self.state = state
-
-        # S3 settings
-        self.s3_bucket = S3_BUCKET
-        self.s3_prefix = S3_PREFIX
         
-        # Temp directory for atomic S3 writes
-        self.temp_dir = "/tmp/collector"
-        if self.backend == "s3":
-            os.makedirs(self.temp_dir, exist_ok=True)
+        # Spool directory for local-first writes
+        self.spool_dir = SPOOL_DIR
         
         # Buffers keyed by (exchange, stream, symbol)
         self.buffers: Dict[tuple, List[dict]] = defaultdict(list)
         self.last_flush: Dict[tuple, float] = defaultdict(lambda: time.time())
         
-        # P3 HARDENING FIX 4: Per-buffer stagger offsets for flush burst protection
-        self.flush_stagger_offsets: Dict[tuple, float] = {}
-        
-        # P3 HARDENING FIX 3: Explicit ThreadPoolExecutor lifecycle
-        self._executor: Optional[ThreadPoolExecutor] = None
-        if self.backend == "s3":
-            self._executor = ThreadPoolExecutor(
-                max_workers=MAX_UPLOAD_WORKERS,
-                thread_name_prefix="s3_upload"
-            )
-        
-        # P3 HARDENING FIX 2: Semaphore for bounded flush concurrency
-        self._flush_sem: Optional[asyncio.Semaphore] = None  # Created lazily in async context
+        # Per-buffer sequence numbers for deterministic filenames
+        self.flush_seq: Dict[tuple, int] = defaultdict(int)
         
         # Stats
         self.total_written = 0
         self.files_written = 0
-        self.in_flight_uploads = 0
-        
-        # P3 HARDENING FIX 5: Failure tracking
-        self.upload_failures = 0
+        self.write_failures = 0
         
         # Silence detection - track last ts_event per (exchange, stream, symbol)
         self.last_ts_event: Dict[tuple, int] = {}
-    
-    def _get_flush_sem(self) -> asyncio.Semaphore:
-        """Get or create flush semaphore (must be called from async context)."""
-        if self._flush_sem is None:
-            self._flush_sem = asyncio.Semaphore(MAX_IN_FLIGHT_UPLOADS)
-        return self._flush_sem
-    
-    def _get_stagger_offset(self, key: tuple) -> float:
-        """Get stagger offset for a buffer key to prevent flush bursts."""
-        if key not in self.flush_stagger_offsets:
-            # Random offset between 0 and half the flush interval
-            self.flush_stagger_offsets[key] = random.uniform(0, self.flush_interval / 2)
-        return self.flush_stagger_offsets[key]
+        
+        # Ensure spool directory exists
+        if self.backend == "spool":
+            os.makedirs(self.spool_dir, exist_ok=True)
+            
+        # P13: Executor for non-blocking flush
+        self.executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="FlushWorker")
     
     def _can_flush_buffer(self, key: tuple, now: float, min_flush_gap: float = None) -> tuple[bool, str]:
         """
-        Check if buffer can be flushed. Returns (can_flush, reason).
+        Check if buffer check should be performed. Returns (should_check, reason).
         
-        P3 HARDENING FIX 4: Enforces minimum flush gap to prevent hot-stream flush storms.
-        P7 ADAPTIVE DRAIN: min_flush_gap can be reduced dynamically when queue is filling.
+        P12: In size-based mode, we check whenever the minimum flush gap has passed
+        and there is data in the buffer. The actual size decision is in _flush_buffer.
         """
         if min_flush_gap is None:
             min_flush_gap = MIN_FLUSH_GAP_SECONDS
@@ -162,24 +104,40 @@ class ParquetWriter:
         
         elapsed = now - self.last_flush[key]
         
-        # Size-based flush (high priority, but still respect minimum gap)
-        if len(buffer) >= self.buffer_size:
-            if elapsed >= min_flush_gap:
-                return True, "size"
-            return False, "min_gap"
-        
-        # Time-based flush (staggered)
-        stagger = self._get_stagger_offset(key)
-        if elapsed - stagger >= self.flush_interval:
-            return True, "time"
+        # P12: Check if enough time has passed to warrant a size/timeout check
+        if elapsed >= min_flush_gap:
+            return True, "check_due"
         
         return False, "not_due"
+    
+    def _get_spool_path(self, exchange: str, stream: str, symbol: str, seq: int) -> str:
+        """
+        Generate spool path for parquet file.
         
+        Path format: {SPOOL_DIR}/exchange={X}/stream={Y}/symbol={Z}/date={YYYYMMDD}/
+        File format: part-{window_start_ts}-{seq}.parquet
+        
+        Deterministic naming: same batch → same filename (idempotent)
+        """
+        date = datetime.now(timezone.utc).strftime("%Y%m%d")
+        window_ts = int(time.time())
+        
+        partition_dir = os.path.join(
+            self.spool_dir,
+            f"exchange={exchange}",
+            f"stream={stream}",
+            f"symbol={symbol.lower()}",
+            f"date={date}"
+        )
+        
+        os.makedirs(partition_dir, exist_ok=True)
+        return os.path.join(partition_dir, f"part-{window_ts}-{seq:06d}.parquet")
+    
     def _get_partition_path(self, exchange: str, stream: str, symbol: str) -> str:
-        """Generate partitioned path for local output file."""
+        """Generate partitioned path for legacy local mode."""
         date = datetime.now(timezone.utc).strftime("%Y%m%d")
         ts = int(time.time() * 1000)
-        file_uuid = uuid.uuid4().hex[:8]
+        seq = self.flush_seq[(exchange, stream, symbol)]
         
         partition_dir = os.path.join(
             self.data_dir,
@@ -190,236 +148,163 @@ class ParquetWriter:
         )
         
         os.makedirs(partition_dir, exist_ok=True)
-        return os.path.join(partition_dir, f"part-{ts}-{file_uuid}.parquet")
+        return os.path.join(partition_dir, f"part-{ts}-{seq:06d}.parquet")
     
-    def _get_s3_object_key(self, exchange: str, stream: str, symbol: str) -> str:
-        """Generate S3 object key with guaranteed uniqueness."""
-        date = datetime.now(timezone.utc).strftime("%Y%m%d")
-        ts = int(time.time() * 1000)
-        file_uuid = uuid.uuid4().hex[:8]
-        
-        path_parts = [
-            f"exchange={exchange}",
-            f"stream={stream}",
-            f"symbol={symbol.lower()}",
-            f"date={date}",
-            f"part-{ts}-{file_uuid}.parquet"
-        ]
-        
-        if self.s3_prefix:
-            return f"{self.s3_prefix.strip('/')}/{'/'.join(path_parts)}"
-        return "/".join(path_parts)
-    
-    def _prepare_flush_data(self, key: tuple) -> Optional[tuple]:
+    def _write_to_spool(self, table: pa.Table, exchange: str, stream: str, symbol: str) -> bool:
         """
-        Prepare data for flush (runs synchronously, but fast).
-        Returns (table, exchange, stream, symbol, count, buffer_snapshot) or None.
+        Write table to local spool with fsync for durability.
         
-        P3 HARDENING FIX 5: Returns buffer_snapshot for recovery on failure.
+        Atomic write protocol:
+        1. Write to .tmp file
+        2. fsync the file
+        3. Rename to final .parquet
+        4. fsync parent directory
+        
+        Returns True on success, False on failure.
+        On failure: buffer is NOT cleared (retry on next flush)
         """
-        buffer = self.buffers.get(key)
-        if not buffer:
-            return None
+        key = (exchange, stream, symbol)
+        seq = self.flush_seq[key]
+        spool_path = self._get_spool_path(exchange, stream, symbol, seq)
+        tmp_path = spool_path + ".tmp"
         
-        exchange, stream, symbol = key
-        count = len(buffer)
-        
-        # P3 HARDENING FIX 5: Keep snapshot for recovery
-        buffer_snapshot = list(buffer)
-        
-        try:
-            # Convert to DataFrame
-            df = pd.DataFrame(buffer)
-            
-            # Get schema for this stream type
-            schema = get_schema(stream)
-            
-            # Create PyArrow table
-            table = pa.Table.from_pandas(df, schema=schema, preserve_index=False)
-            
-            # Clear buffer immediately (data is now in table)
-            self.buffers[key].clear()
-            self.last_flush[key] = time.time()
-            
-            return (table, exchange, stream, symbol, count, buffer_snapshot)
-            
-        except Exception as e:
-            print(f"[Writer] Error preparing flush for {key}: {e}")
-            return None
-    
-    def _write_to_s3_sync(self, table: pa.Table, exchange: str, stream: str, symbol: str) -> bool:
-        """
-        Synchronous S3 upload - runs in ThreadPoolExecutor.
-        
-        This method contains the blocking I/O that previously blocked the event loop.
-        Now it runs in a separate thread, keeping the event loop responsive.
-        """
-        temp_path = None
         try:
             # 1. Write to temp file
-            temp_uuid = uuid.uuid4().hex
-            temp_path = os.path.join(self.temp_dir, f"{temp_uuid}.parquet")
-            pq.write_table(table, temp_path)
+            pq.write_table(table, tmp_path)
             
-            # 2. Upload to S3
-            object_key = self._get_s3_object_key(exchange, stream, symbol)
-            s3 = _get_s3_client()
+            # 2. fsync the file for durability
+            fd = os.open(tmp_path, os.O_RDONLY)
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
             
-            with open(temp_path, "rb") as f:
-                s3.put_object(
-                    Bucket=self.s3_bucket,
-                    Key=object_key,
-                    Body=f
-                )
+            # 3. Atomic rename
+            os.rename(tmp_path, spool_path)
+            
+            # 4. fsync parent directory for metadata durability
+            parent_dir = os.path.dirname(spool_path)
+            fd = os.open(parent_dir, os.O_RDONLY)
+            try:
+                os.fsync(fd)
+            finally:
+                os.close(fd)
+            
+            # Increment sequence for next file
+            self.flush_seq[key] = seq + 1
             
             return True
             
         except Exception as e:
-            # P3 HARDENING FIX 5: Log explicitly (will be caught by caller)
-            print(f"[Writer] S3 UPLOAD FAILED: {exchange}/{stream}/{symbol} - {e}")
-            raise  # Re-raise so caller can handle recovery
+            print(f"[Writer] SPOOL WRITE FAILED: {exchange}/{stream}/{symbol} - {e}")
+            self.write_failures += 1
             
-        finally:
-            # 3. Always clean up temp file
-            if temp_path and os.path.exists(temp_path):
+            # Clean up temp file if exists
+            if os.path.exists(tmp_path):
                 try:
-                    os.remove(temp_path)
+                    os.remove(tmp_path)
                 except Exception:
                     pass
-    
-    async def _write_to_s3_async(self, table: pa.Table, exchange: str, stream: str, symbol: str) -> bool:
-        """
-        Async wrapper for S3 upload - offloads to ThreadPoolExecutor.
-        
-        P3 HARDENING FIX 1: Uses get_running_loop() instead of get_event_loop().
-        get_event_loop() is deprecated and can fail in nested loop scenarios.
-        """
-        # FIX 1: get_running_loop() is safe in async context, get_event_loop() is not
-        loop = asyncio.get_running_loop()
-        
-        return await loop.run_in_executor(
-            self._executor,
-            self._write_to_s3_sync,
-            table, exchange, stream, symbol
-        )
-    
-    async def _flush_buffer_async(self, key: tuple) -> bool:
-        """
-        Async flush with semaphore-bounded concurrency.
-        
-        P3 HARDENING FIX 2: Semaphore strictly enforces MAX_IN_FLIGHT_UPLOADS.
-        P3 HARDENING FIX 5: Failed uploads restore buffer data (no silent loss).
-        """
-        flush_data = self._prepare_flush_data(key)
-        if flush_data is None:
+            
             return False
-        
-        table, exchange, stream, symbol, count, buffer_snapshot = flush_data
-        
-        # FIX 2: Semaphore-guarded upload
-        async with self._get_flush_sem():
-            self.in_flight_uploads += 1
-            try:
-                if self.backend == "s3":
-                    success = await self._write_to_s3_async(table, exchange, stream, symbol)
-                else:
-                    # Local writes are fast, keep synchronous
-                    try:
-                        self._write_to_local(table, exchange, stream, symbol)
-                        success = True
-                    except Exception as e:
-                        print(f"[Writer] Local write error for {key}: {e}")
-                        success = False
-                
-                if success:
-                    self.total_written += count
-                    self.files_written += 1
-                    
-                    # Update shared state
-                    if self.state:
-                        self.state.last_write_ts = time.time() * 1000
-                        self.state.writer_stats = self.get_stats()
-                
-                return success
-                
-            except Exception as e:
-                # P3 HARDENING FIX 5: Restore buffer on failure (no data loss)
-                print(f"[Writer] FLUSH FAILED for {key}, restoring {count} events: {e}")
-                self.upload_failures += 1
-                
-                # Restore events to buffer
-                self.buffers[key].extend(buffer_snapshot)
-                
-                # Update failure metric in state
-                if self.state:
-                    self.state.writer_stats = self.get_stats()
-                
-                return False
-                
-            finally:
-                self.in_flight_uploads -= 1
     
-    def _flush_buffer(self, key: tuple):
+    def _write_to_local(self, table: pa.Table, exchange: str, stream: str, symbol: str) -> bool:
+        """Write table to local filesystem (legacy mode)."""
+        try:
+            path = self._get_partition_path(exchange, stream, symbol)
+            pq.write_table(table, path)
+            self.flush_seq[(exchange, stream, symbol)] += 1
+            return True
+        except Exception as e:
+            print(f"[Writer] LOCAL WRITE FAILED: {exchange}/{stream}/{symbol} - {e}")
+            self.write_failures += 1
+            return False
+            
+    def _flush_sync(self, buffer: List[dict], key: tuple, now: float):
         """
-        Synchronous flush - ONLY for local backend or shutdown.
-        For S3, use _flush_buffer_async() instead.
+        Synchronous flush - RUNS IN THREAD POOL.
+        P13: Handles heavy pandas/pyarrow/parquet/fsync work.
+        """
+        exchange, stream, symbol = key
+        count = len(buffer)
+        
+        try:
+            # 1. Convert to Table
+            df = pd.DataFrame(buffer)
+            schema = get_schema(stream)
+            table = pa.Table.from_pandas(df, schema=schema, preserve_index=False)
+            
+            # 2. Condition check (Double check size inside thread)
+            is_big_enough = table.nbytes >= self.max_parquet_mb * 1024 * 1024
+            is_old_enough = (now - self.last_flush[key]) >= self.max_flush_sec
+            
+            # Note: We still write if it was a forced flush or if conditions hold
+            # But the 'can_flush' check already filtered most.
+            
+            # 3. Write to storage
+            if self.backend == "spool":
+                success = self._write_to_spool(table, exchange, stream, symbol)
+            else:
+                success = self._write_to_local(table, exchange, stream, symbol)
+            
+            if success:
+                # Update stats (GIL makes this safe for simple increments)
+                self.total_written += count
+                self.files_written += 1
+                self.last_flush[key] = now
+                
+                # Update shared state
+                if self.state:
+                    self.state.last_write_ts = now * 1000
+                    # self.state.writer_stats = self.get_stats() # skip frequent state updates from threads
+                
+                reason = "size" if is_big_enough else "timeout"
+                print(f"[Writer] FLUSH SUCCESS ({reason}): {exchange}/{stream}/{symbol} - {count} events, {table.nbytes/1024/1024:.2f}MB")
+            else:
+                print(f"[Writer] FLUSH FAILED (write error): {key}")
+                self.write_failures += 1
+                
+        except Exception as e:
+            print(f"[Writer] FLUSH CRITICAL ERROR for {key}: {e}")
+            self.write_failures += 1
+
+    def _flush_buffer(self, key: tuple, now: float) -> bool:
+        """
+        Flush buffer wrapper. Swaps buffer and dispatches to executor.
+        
+        P13 CRITICAL BEHAVIOR:
+        1. Fast check if buffer should be flushed (O(1)).
+        2. If due, SWAP buffer and SUBMIT to executor.
+        3. No blocking in writer loop.
         """
         buffer = self.buffers.get(key)
         if not buffer:
-            return
+            return False
+            
+        elapsed = now - self.last_flush[key]
+        count = len(buffer)
         
-        exchange, stream, symbol = key
+        # P13 FAST CHECK: Skip expensive table conversion in main loop
+        # We only dispatch if it's likely to flush (count > 1000 or 180s)
+        is_old_enough = elapsed >= self.max_flush_sec
+        if count < 1000 and not is_old_enough:
+            return False
+            
+        # P13: SWAP AND DISPATCH
+        # Snapshot takes O(1) in Python (list swap)
+        snapshot = self.buffers[key]
+        self.buffers[key] = []
         
-        try:
-            # Convert to DataFrame
-            df = pd.DataFrame(buffer)
-            
-            # Get schema for this stream type
-            schema = get_schema(stream)
-            
-            # Create PyArrow table
-            table = pa.Table.from_pandas(df, schema=schema, preserve_index=False)
-            
-            if self.backend == "s3":
-                self._write_to_s3_sync(table, exchange, stream, symbol)
-            else:
-                self._write_to_local(table, exchange, stream, symbol)
-            
-            # Update stats
-            count = len(buffer)
-            self.total_written += count
-            self.files_written += 1
-            
-            # Clear buffer
-            self.buffers[key].clear()
-            self.last_flush[key] = time.time()
-            
-            # Update shared state
-            if self.state:
-                self.state.last_write_ts = time.time() * 1000
-                self.state.writer_stats = self.get_stats()
-            
-        except Exception as e:
-            print(f"[Writer] SYNC FLUSH FAILED for {key}: {e}")
-            self.upload_failures += 1
-    
-    def _write_to_local(self, table: pa.Table, exchange: str, stream: str, symbol: str):
-        """Write table to local filesystem."""
-        path = self._get_partition_path(exchange, stream, symbol)
-        pq.write_table(table, path)
+        # Submit to thread pool
+        self.executor.submit(self._flush_sync, snapshot, key, now)
+        return True
     
     def _check_silence(self, event: Event):
         """
         Check for inter-event silence (time gap) based on ts_event continuity.
-        
-        NOTE: This is NOT sequence gap detection. It detects periods where no events
-        arrive for a stream, which may indicate stale data (but NOT data loss).
-        Streams with None threshold in SILENCE_THRESHOLDS_MS are not monitored.
         """
-        # Get threshold from config (None = disabled)
         threshold = SILENCE_THRESHOLDS_MS.get(event.stream)
         if threshold is None:
-            # Stream not monitored (e.g., trade, bbo - variable frequency)
             return
         
         key = (event.exchange, event.stream, event.symbol)
@@ -458,22 +343,16 @@ class ParquetWriter:
         # P1-A: Handle alignment events (RAM-only, not written)
         if isinstance(event, AlignmentEvent):
             self._handle_alignment(event)
-            return  # Do NOT write to parquet
+            return
         
-        # Check for inter-event silence (only for monitored streams)
+        # Check for inter-event silence
         self._check_silence(event)
         
         key = (event.exchange, event.stream, event.symbol)
         self.buffers[key].append(event.to_dict())
-        
-        if self.state:
-            # P10: update_event moved to backpressure.py (enqueue_event) for truthfulness
-            pass
-        
-        # NOTE: Flush is handled by writer_task, not here (prevents blocking)
     
     def flush_all(self):
-        """Flush all buffers synchronously (for shutdown only)."""
+        """Flush all buffers synchronously (for shutdown)."""
         for key in list(self.buffers.keys()):
             if self.buffers[key]:
                 self._flush_buffer(key)
@@ -486,74 +365,51 @@ class ParquetWriter:
             "files_written": self.files_written,
             "pending_events": pending,
             "active_buffers": len(self.buffers),
-            "in_flight_uploads": self.in_flight_uploads,
-            "upload_failures": self.upload_failures,  # P3 HARDENING: Visible failure count
+            "write_failures": self.write_failures,
+            "drain_mode": "normal",  # Will be updated by writer_task
         }
     
-    def cleanup_temp(self):
-        """Clean up temp directory on shutdown."""
-        if self.backend == "s3" and os.path.exists(self.temp_dir):
-            try:
-                shutil.rmtree(self.temp_dir)
-                os.makedirs(self.temp_dir, exist_ok=True)
-            except Exception:
-                pass
-    
     def shutdown(self):
-        """
-        P3 HARDENING FIX 3: Graceful shutdown of ThreadPoolExecutor.
-        Called on service stop / SIGTERM. Waits for in-flight uploads to complete.
-        """
-        if self._executor:
-            print("[Writer] Shutting down ThreadPoolExecutor (waiting for in-flight uploads)...")
-            self._executor.shutdown(wait=True)
-            self._executor = None
-            print("[Writer] ThreadPoolExecutor shutdown complete")
+        """Graceful shutdown - flush remaining buffers."""
+        print("[Writer] Shutting down, flushing remaining buffers...")
+        self.flush_all()
+        print("[Writer] Shutdown complete")
 
 
 async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
     """
-    Main writer task - consumes from queue and writes to storage.
+    Main writer task - consumes from queue and writes to LOCAL SPOOL.
     
-    P3 Architecture:
-    - Main loop processes queue events without blocking
-    - Flushes are semaphore-bounded (MAX_IN_FLIGHT_UPLOADS)
-    - S3 uploads run in ThreadPoolExecutor, never blocking the event loop
-    - Staggered flush scheduling + min flush gap prevents flush bursts
-    - Explicit exception handling ensures no silent data loss
-    
-    P7 Adaptive Drain:
-    - Monitors queue utilization and switches between normal/accelerated modes
-    - Accelerated mode reduces min_flush_gap from 5s to 1s (5x faster drain)
-    - Hysteresis: enter at 50%, exit at 40% (prevents oscillation)
+    P11 Architecture:
+    - NO S3 code
+    - Writes to local spool with fsync
+    - On write failure: buffer preserved (retry next flush)
+    - Adaptive drain mode for queue pressure
     """
     writer = ParquetWriter(state=state)
     
-    # P7: Track drain mode locally (also synced to state for API exposure)
-    drain_mode = "normal"  # "normal" or "accelerated"
+    # Track drain mode
+    drain_mode = "normal"
     
-    # P7: Guardrail tracking
+    # Guardrail tracking
     last_drain_count = 0
     last_rate_check = time.time()
     
     # Startup logging
-    if writer.backend == "s3":
-        print(f"[Writer] Backend: S3 (async with ThreadPoolExecutor, max {MAX_UPLOAD_WORKERS} workers)")
-        print(f"[Writer] Bucket: {writer.s3_bucket}")
-        print(f"[Writer] Endpoint: {S3_ENDPOINT}")
-        print(f"[Writer] Prefix: {writer.s3_prefix}")
-        print(f"[Writer] Buffer size: {writer.buffer_size}, Flush interval: {writer.flush_interval}s")
-        print(f"[Writer] Max in-flight: {MAX_IN_FLIGHT_UPLOADS}, Flush gap: {DRAIN_NORMAL_FLUSH_GAP}s (normal) / {DRAIN_ACCELERATED_FLUSH_GAP}s (accelerated)")
-        print(f"[Writer] Adaptive drain thresholds: enter={DRAIN_ACCELERATION_ENTER_PCT}%, exit={DRAIN_ACCELERATION_EXIT_PCT}%")
+    print(f"[Writer] Backend: {writer.backend.upper()}")
+    if writer.backend == "spool":
+        print(f"[Writer] Spool directory: {writer.spool_dir}")
     else:
-        print(f"[Writer] Backend: Local")
-        print(f"[Writer] Path: {writer.data_dir}")
+        print(f"[Writer] Data directory: {writer.data_dir}")
+    print(f"[Writer] Max size: {writer.max_parquet_mb}MB, Max interval: {writer.max_flush_sec}s")
+    print(f"[Writer] Adaptive check gap: {DRAIN_NORMAL_FLUSH_GAP}s (normal) / {DRAIN_ACCELERATED_FLUSH_GAP}s (accelerated)")
+    print(f"[Writer] NOTE: S3 upload handled by separate uploader service")
     
     last_stats_time = time.time()
     
     while True:
         try:
-            # Get event from queue with timeout for periodic flushing
+            # Get event from queue with timeout
             try:
                 event = await asyncio.wait_for(queue.get(), timeout=1.0)
                 writer.add_event(event)
@@ -563,72 +419,55 @@ async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
             
             now = time.time()
             
-            # P7: Calculate queue utilization and determine drain mode
+            # Calculate queue utilization for adaptive drain
             queue_size = queue.qsize()
             queue_max = queue.maxsize
             queue_util = (queue_size / queue_max * 100) if queue_max > 0 else 0
             
-            # P7: Adaptive drain mode switching with hysteresis
+            # Adaptive drain mode switching
             old_mode = drain_mode
             if drain_mode == "normal" and queue_util >= DRAIN_ACCELERATION_ENTER_PCT:
                 drain_mode = "accelerated"
             elif drain_mode == "accelerated" and queue_util < DRAIN_ACCELERATION_EXIT_PCT:
                 drain_mode = "normal"
             
-            # Log mode transitions
             if old_mode != drain_mode:
                 print(f"[Writer] Drain mode -> {drain_mode.upper()} (queue={queue_util:.0f}%)")
                 if state:
                     state.drain_mode = drain_mode
             
-            # P7: Determine min_flush_gap based on drain mode
+            # Determine min_flush_gap based on drain mode
             min_flush_gap = DRAIN_ACCELERATED_FLUSH_GAP if drain_mode == "accelerated" else DRAIN_NORMAL_FLUSH_GAP
             
-            # Check for buffers ready to flush (with adaptive flush gap)
-            flush_tasks = []
-            
+            # Check for buffers ready to flush
             for key in list(writer.buffers.keys()):
-                can_flush, reason = writer._can_flush_buffer(key, now, min_flush_gap)
-                if can_flush:
-                    flush_tasks.append(writer._flush_buffer_async(key))
+                can_check, reason = writer._can_flush_buffer(key, now, min_flush_gap)
+                if can_check:
+                    writer._flush_buffer(key, now)
             
-            # P3 HARDENING FIX 2 & 5: Execute with explicit exception handling
-            if flush_tasks:
-                results = await asyncio.gather(*flush_tasks, return_exceptions=True)
-                
-                # FIX 5: Log any unexpected exceptions (not already handled inside _flush_buffer_async)
-                for i, result in enumerate(results):
-                    if isinstance(result, Exception):
-                        print(f"[Writer] UNEXPECTED ERROR in flush task {i}: {result}")
-                        writer.upload_failures += 1
-            
-            # P7: Update guardrail metrics every 10 seconds
+            # Update guardrail metrics every 10 seconds
             rate_elapsed = now - last_rate_check
             if rate_elapsed >= 10 and state:
-                # Calculate drain rate (events written per second)
                 drain_delta = writer.total_written - last_drain_count
                 state.drain_rate = round(drain_delta / rate_elapsed, 1)
                 last_drain_count = writer.total_written
                 
-                # Ingestion rate is already in state.eps (sum of all streams)
                 state.ingestion_rate = sum(state.eps.values())
-                
-                # Queue growth rate
                 state.queue_growth_rate = round(state.ingestion_rate - state.drain_rate, 1)
                 
-                # P7: Sustained growth warning
+                # Sustained growth warning
                 if state.queue_growth_rate > SUSTAINED_GROWTH_WARN_THRESHOLD:
                     if state._growth_warning_start == 0:
                         state._growth_warning_start = now
                     elif now - state._growth_warning_start >= SUSTAINED_GROWTH_WARN_SECONDS:
                         print(f"[Writer] WARNING: Sustained queue growth {state.queue_growth_rate:.0f} ev/s for {now - state._growth_warning_start:.0f}s")
-                        state._growth_warning_start = now  # Reset to avoid spam
+                        state._growth_warning_start = now
                 else:
                     state._growth_warning_start = 0
                 
                 last_rate_check = now
             
-            # Print stats every 30 seconds (include drain_mode)
+            # Print stats every 30 seconds
             if now - last_stats_time >= 30:
                 stats = writer.get_stats()
                 stats["drain_mode"] = drain_mode
@@ -636,16 +475,8 @@ async def writer_task(queue: asyncio.Queue, state: CollectorState = None):
                 last_stats_time = now
                 
         except asyncio.CancelledError:
-            # FIX 3: Graceful shutdown sequence
             print("[Writer] Received shutdown signal, flushing remaining buffers...")
-            
-            # Synchronous flush to ensure all data is written
             writer.flush_all()
-            writer.cleanup_temp()
-            
-            # Shutdown executor gracefully
-            writer.shutdown()
-            
             print(f"[Writer] Final stats: {writer.get_stats()}")
             break
         except Exception as e:

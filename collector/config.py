@@ -23,11 +23,10 @@ BYBIT_WS_URL = "wss://stream.bybit.com/v5/public/linear"
 OKX_WS_URL = "wss://ws.okx.com:8443/ws/v5/public"
 
 # Writer settings
-# P3: Increased to reduce flush frequency and prevent event loop blocking
-# - BUFFER_SIZE 5000: Collects more events before flushing, reducing S3 call rate
-# - FLUSH_INTERVAL 60s: Prevents flush clustering that caused "Stop-the-World" pauses
-BUFFER_SIZE = 5000
-FLUSH_INTERVAL = 60
+# P12: Size-based flush (min 10MB) or time-based fallback (3 min)
+# This prevents uploader backlog from many tiny files.
+MAX_PARQUET_MB = 10
+MAX_FLUSH_SEC = 180
 DATA_DIR = "/opt/quantlab/data"
 QUALITY_DIR = "/opt/quantlab/quality"
 
@@ -42,10 +41,16 @@ HEARTBEAT_TIMEOUT = 30  # seconds
 # Schema versioning (increment when event structure changes)
 STREAM_VERSION = 1
 
-# Storage backend: "local" or "s3"
-STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "local")
+# Storage backend: "local" or "spool"
+# "spool" mode: writes to SPOOL_DIR for async uploader to process
+# "local" mode: writes to DATA_DIR (legacy, no S3)
+STORAGE_BACKEND = os.getenv("STORAGE_BACKEND", "spool")
 
-# S3 settings (only used when STORAGE_BACKEND = "s3")
+# Spool directory for local-first architecture
+# Uploader will scan this directory and upload to S3
+SPOOL_DIR = os.getenv("SPOOL_DIR", "/opt/quantlab/spool")
+
+# S3 settings (ONLY used by uploader service, NOT by collector)
 S3_ENDPOINT = os.getenv("S3_ENDPOINT", "")
 S3_ACCESS_KEY = os.getenv("S3_ACCESS_KEY", "")
 S3_SECRET_KEY = os.getenv("S3_SECRET_KEY", "")

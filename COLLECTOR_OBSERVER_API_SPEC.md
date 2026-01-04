@@ -128,6 +128,27 @@ The API is the sole source of truth for the collector's operational state and hi
 ]
 ```
 
+## 5. GET `/collector/uploader/now`
+**Purpose**: Status of the asynchronous S3 uploader. Monitors local spool and S3 sync health.
+
+### Response Example
+```json
+{
+  "state": "READY",
+  "last_success_upload_utc": "2026-01-04T05:35:13Z",
+  "seconds_since_last_success": 842,
+  "pending_files": 128,
+  "spool_size_gb": 0.12,
+  "alert_sent_24h": false
+}
+```
+
+### State Rules
+- **READY**: `seconds_since_last_success` < 1h. Normal operation.
+- **DEGRADED**: 1h–24h since last success. Investigating potential S3 hiccup.
+- **BAD**: ≥24h since last success. Data at risk if disk fills.
+- **ERROR**: Uploader state file missing or unreadable.
+
 ---
 
 ## ⚖️ Collector API Contract Guarantees

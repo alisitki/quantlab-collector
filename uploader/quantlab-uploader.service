@@ -1,0 +1,32 @@
+[Unit]
+Description=QuantLab S3 Uploader Service
+Documentation=https://github.com/quantlab/collector
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/quantlab/uploader
+EnvironmentFile=/opt/quantlab/.env
+ExecStart=/usr/bin/python3 /opt/quantlab/uploader/uploader.py
+Restart=always
+RestartSec=10
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=quantlab-uploader
+
+# Resource limits
+MemoryMax=512M
+CPUQuota=50%
+
+# Security hardening
+NoNewPrivileges=yes
+ProtectSystem=strict
+ReadWritePaths=/opt/quantlab/spool /var/lib/quantlab
+
+[Install]
+WantedBy=multi-user.target
