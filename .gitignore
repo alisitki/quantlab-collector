@@ -13,3 +13,5 @@ quality/
 data/
 *.tmp
 logs/
+quality_uploader/quality_uploader_state.json
+quality_uploader/*.tmp
