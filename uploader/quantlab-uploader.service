@@ -26,7 +26,7 @@ CPUQuota=50%
 # Security hardening
 NoNewPrivileges=yes
 ProtectSystem=strict
-ReadWritePaths=/opt/quantlab/spool /var/lib/quantlab
+ReadWritePaths=/opt/quantlab/spool /var/lib/quantlab /opt/quantlab/quarantine
 
 [Install]
 WantedBy=multi-user.target

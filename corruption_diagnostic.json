@@ -1,0 +1,19 @@
+{
+  "dates": [
+    "20260104"
+  ],
+  "total_estimate": 16521,
+  "files_tested": 18,
+  "results": {
+    "OK": 18,
+    "CORRUPT": 0,
+    "ERROR": 0
+  },
+  "corrupt_files": [],
+  "date_stats": {
+    "20260104": {
+      "ok": 18,
+      "corrupt": 0
+    }
+  }
+}

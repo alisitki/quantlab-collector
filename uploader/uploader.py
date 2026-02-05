@@ -21,10 +21,15 @@ import json
 import glob
 import asyncio
 import logging
+import shutil
+import hashlib
+import base64
 from datetime import datetime, timezone
 from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor
-from typing import Optional, List, Set
+from typing import Optional, List, Set, Tuple
+
+import pyarrow.parquet as pq
 
 # Load environment from .env if present
 from dotenv import load_dotenv
@@ -36,6 +41,7 @@ load_dotenv("/opt/quantlab/.env")
 # =============================================================================
 SPOOL_DIR = os.getenv("SPOOL_DIR", "/opt/quantlab/spool")
 STATE_FILE = os.getenv("UPLOADER_STATE_FILE", "/var/lib/quantlab/uploader_state.json")
+QUARANTINE_DIR = os.getenv("QUARANTINE_DIR", "/opt/quantlab/quarantine")
 
 # S3 settings
 S3_ENDPOINT = os.getenv("S3_ENDPOINT", "")
@@ -104,6 +110,7 @@ class UploaderState:
         self.alert_sent: bool = False
         self.total_uploaded: int = 0
         self.total_failed: int = 0
+        self.total_quarantined: int = 0
         self._load()
     
     def _load(self):
@@ -116,6 +123,7 @@ class UploaderState:
                 self.alert_sent = data.get("alert_sent", False)
                 self.total_uploaded = data.get("total_uploaded", 0)
                 self.total_failed = data.get("total_failed", 0)
+                self.total_quarantined = data.get("total_quarantined", 0)
                 log.info(f"State loaded: last_success={self._format_ago(self.last_success_ts)}, alert_sent={self.alert_sent}")
         except Exception as e:
             log.warning(f"Could not load state: {e}, using defaults")
@@ -131,6 +139,7 @@ class UploaderState:
                     "alert_sent": self.alert_sent,
                     "total_uploaded": self.total_uploaded,
                     "total_failed": self.total_failed,
+                    "total_quarantined": self.total_quarantined,
                 }, f, indent=2)
             os.rename(tmp, self.state_file)
         except Exception as e:
@@ -146,6 +155,11 @@ class UploaderState:
     def record_failure(self):
         """Record a failed upload."""
         self.total_failed += 1
+        self._save()
+    
+    def record_quarantine(self):
+        """Record a quarantined file."""
+        self.total_quarantined += 1
         self._save()
     
     def hours_since_success(self) -> float:
@@ -168,6 +182,66 @@ class UploaderState:
         if hours < 1:
             return f"{int(hours * 60)} minutes ago"
         return f"{hours:.1f} hours ago"
+
+
+# =============================================================================
+# Pre-Upload Validation
+# =============================================================================
+def validate_parquet(filepath: str) -> Tuple[bool, str]:
+    """
+    Validate parquet file is readable before upload.
+
+    Uses ParquetFile with read_row_group to avoid PyArrow dictionary
+    unification issues that can occur in long-running processes when
+    reading files with different schema encodings.
+
+    P14: Added PAR1 marker check to detect race condition concatenation.
+    A valid parquet file has exactly 2 PAR1 markers (header + footer).
+
+    Returns:
+        (True, row_count) if valid
+        (False, error_message) if corrupt
+    """
+    try:
+        # P14: Check for concatenation (multiple PAR1 markers)
+        with open(filepath, 'rb') as f:
+            data = f.read()
+
+        par1_count = data.count(b'PAR1')
+        if par1_count != 2:
+            return False, f"Corrupted: {par1_count} PAR1 markers (expected 2)"
+
+        # Use ParquetFile for more controlled reading
+        pf = pq.ParquetFile(filepath)
+
+        # Read first row group to verify data is readable
+        # This catches Snappy/Thrift corruption without full table merge
+        if pf.metadata.num_row_groups > 0:
+            _ = pf.read_row_group(0)
+
+        return True, f"{pf.metadata.num_rows} rows"
+    except Exception as e:
+        return False, str(e)[:150]
+
+
+def quarantine_file(filepath: str, reason: str):
+    """
+    Move corrupt file to quarantine directory.
+    Preserves original path structure for debugging.
+    """
+    os.makedirs(QUARANTINE_DIR, exist_ok=True)
+    
+    # Create dated subdirectory
+    date_dir = datetime.now(timezone.utc).strftime("%Y%m%d")
+    dest_dir = os.path.join(QUARANTINE_DIR, date_dir)
+    os.makedirs(dest_dir, exist_ok=True)
+    
+    # Move file
+    dest = os.path.join(dest_dir, os.path.basename(filepath))
+    shutil.move(filepath, dest)
+    
+    log.warning(f"QUARANTINED: {os.path.basename(filepath)} -> {dest}")
+    log.warning(f"  Reason: {reason}")
 
 
 # =============================================================================
@@ -281,38 +355,90 @@ class Uploader:
         self.in_flight: Set[str] = set()
         self.retry_counts: dict = {}  # filepath -> retry count
     
-    def _upload_sync(self, filepath: str, s3_key: str) -> bool:
-        """Synchronous S3 upload (runs in executor)."""
+    def _upload_sync_atomic(self, filepath: str, s3_key: str) -> Tuple[bool, str]:
+        """
+        Atomic S3 upload with MD5 checksum verification.
+        
+        Flow:
+        1. Read file and compute MD5
+        2. Upload with Content-MD5 header (S3 validates on receive)
+        3. Verify ETag matches local MD5
+        
+        Returns: (success, message)
+        """
         try:
             s3 = get_s3_client()
+            
+            # Read file and compute MD5
             with open(filepath, "rb") as f:
-                s3.put_object(Bucket=S3_BUCKET, Key=s3_key, Body=f)
-            return True
+                data = f.read()
+            
+            md5_digest = hashlib.md5(data).digest()
+            md5_hex = hashlib.md5(data).hexdigest()
+            content_md5 = base64.b64encode(md5_digest).decode('utf-8')
+            
+            # Upload with Content-MD5 (S3 validates checksum on receive)
+            s3.put_object(
+                Bucket=S3_BUCKET,
+                Key=s3_key,
+                Body=data,
+                ContentMD5=content_md5
+            )
+            
+            # Verify ETag matches (double-check)
+            resp = s3.head_object(Bucket=S3_BUCKET, Key=s3_key)
+            remote_etag = resp['ETag'].strip('"')
+            
+            if remote_etag == md5_hex:
+                return True, "verified"
+            else:
+                log.error(f"Checksum mismatch: local={md5_hex} remote={remote_etag}")
+                return False, f"checksum_mismatch"
+                
         except Exception as e:
             log.warning(f"Upload failed: {os.path.basename(filepath)} - {e}")
-            return False
+            return False, str(e)[:100]
     
     async def upload_file(self, filepath: str):
-        """Upload single file with retry backoff."""
+        """
+        Upload single file with pre-validation and atomic upload.
+        
+        Flow:
+        1. Pre-validate parquet file readability
+        2. Quarantine if corrupt
+        3. Atomic upload with checksum verification
+        4. Delete only on verified success
+        """
         if filepath in self.in_flight:
             return
         
         self.in_flight.add(filepath)
-        s3_key = filepath_to_s3_key(filepath)
         
         try:
+            # 1. Pre-upload validation
+            valid, msg = validate_parquet(filepath)
+            if not valid:
+                log.warning(f"Corrupt file detected: {os.path.basename(filepath)}")
+                quarantine_file(filepath, msg)
+                self.state.record_quarantine()
+                self.retry_counts.pop(filepath, None)
+                return
+            
+            # 2. Get S3 key and upload atomically
+            s3_key = filepath_to_s3_key(filepath)
+            
             loop = asyncio.get_running_loop()
-            success = await loop.run_in_executor(
+            success, upload_msg = await loop.run_in_executor(
                 self.executor,
-                self._upload_sync,
+                self._upload_sync_atomic,
                 filepath, s3_key
             )
             
             if success:
-                # Delete local file on success
+                # 3. Delete local file only after verified upload
                 try:
                     os.remove(filepath)
-                    log.info(f"Uploaded & deleted: {os.path.basename(filepath)}")
+                    log.info(f"Uploaded & verified & deleted: {os.path.basename(filepath)}")
                 except Exception as e:
                     log.warning(f"Could not delete after upload: {filepath} - {e}")
                 
@@ -327,7 +453,7 @@ class Uploader:
                 # Calculate backoff delay
                 backoff_idx = min(count, len(RETRY_BACKOFF) - 1)
                 delay = RETRY_BACKOFF[backoff_idx]
-                log.info(f"Will retry {os.path.basename(filepath)} in {delay}s (attempt {count + 1})")
+                log.info(f"Will retry {os.path.basename(filepath)} in {delay}s (attempt {count + 1}, reason: {upload_msg})")
                 
         finally:
             self.in_flight.discard(filepath)
@@ -337,6 +463,8 @@ class Uploader:
         log.info(f"Uploader starting: spool={SPOOL_DIR}, bucket={S3_BUCKET}")
         log.info(f"Concurrency: {MAX_CONCURRENT_UPLOADS}, Idle sleep: {SCAN_INTERVAL_IDLE}s")
         log.info(f"Alert threshold: {ALERT_THRESHOLD_HOURS} hours")
+        log.info(f"Quarantine directory: {QUARANTINE_DIR}")
+        log.info(f"Features: pre-upload validation, atomic upload with MD5 verification")
         
         while True:
             try:
