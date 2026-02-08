@@ -15,10 +15,9 @@ Key behaviors:
 import asyncio
 import os
 import time
-import threading
 from datetime import datetime, timezone
 from collections import defaultdict
-from typing import Dict, List, Optional, Set
+from typing import Dict, List, Optional
 from concurrent.futures import ThreadPoolExecutor
 
 import pandas as pd
@@ -89,11 +88,6 @@ class ParquetWriter:
             
         # P13: Executor for non-blocking flush
         self.executor = ThreadPoolExecutor(max_workers=4, thread_name_prefix="FlushWorker")
-
-        # P14: In-flight tracking to prevent concurrent flushes of same key
-        self.in_flight_keys: Set[tuple] = set()
-        self._in_flight_lock = threading.Lock()
-        self.concurrent_flush_blocked = 0
     
     def _can_flush_buffer(self, key: tuple, now: float, min_flush_gap: float = None) -> tuple[bool, str]:
         """
@@ -319,10 +313,6 @@ class ParquetWriter:
         except Exception as e:
             print(f"[Writer] FLUSH CRITICAL ERROR for {key} seq={seq}: {e}")
             self.write_failures += 1
-        finally:
-            # P14: Remove from in-flight set
-            with self._in_flight_lock:
-                self.in_flight_keys.discard(key)
 
     def _flush_buffer(self, key: tuple, now: float) -> bool:
         """
@@ -334,20 +324,16 @@ class ParquetWriter:
         3. No blocking in writer loop.
 
         P14 RACE CONDITION FIX:
-        - Check if key is already in-flight (prevents concurrent flushes)
-        - Atomically get and increment seq BEFORE dispatch
+        - Atomically get and increment seq BEFORE dispatch (in main thread)
         - Pass seq to thread worker
+        - This allows parallel flushes with different seq numbers (no file collision)
+
+        P14-FIX: Removed in-flight tracking - it was throttling throughput and
+        causing queue overflow. Seq fix alone prevents race condition.
         """
         buffer = self.buffers.get(key)
         if not buffer:
             return False
-
-        # P14: Check if this key is already being flushed
-        with self._in_flight_lock:
-            if key in self.in_flight_keys:
-                self.concurrent_flush_blocked += 1
-                return False  # Already flushing this key
-            self.in_flight_keys.add(key)
 
         elapsed = now - self.last_flush[key]
         count = len(buffer)
@@ -356,13 +342,10 @@ class ParquetWriter:
         # We only dispatch if it's likely to flush (count > 1000 or 180s)
         is_old_enough = elapsed >= self.max_flush_sec
         if count < 1000 and not is_old_enough:
-            # P14: Remove from in-flight since we're not actually flushing
-            with self._in_flight_lock:
-                self.in_flight_keys.discard(key)
             return False
 
         # P14: Atomically get and increment seq BEFORE dispatch
-        # This prevents race condition where two threads read same seq
+        # This prevents race condition - each parallel flush gets unique seq
         seq = self.flush_seq[key]
         self.flush_seq[key] = seq + 1
 
@@ -429,15 +412,14 @@ class ParquetWriter:
     
     def flush_all(self):
         """Flush all buffers synchronously (for shutdown)."""
+        now = time.time()
         for key in list(self.buffers.keys()):
             if self.buffers[key]:
-                self._flush_buffer(key)
+                self._flush_buffer(key, now)
     
     def get_stats(self) -> dict:
         """Get writer statistics."""
         pending = sum(len(b) for b in self.buffers.values())
-        with self._in_flight_lock:
-            in_flight_count = len(self.in_flight_keys)
         return {
             "total_written": self.total_written,
             "files_written": self.files_written,
@@ -445,8 +427,6 @@ class ParquetWriter:
             "active_buffers": len(self.buffers),
             "write_failures": self.write_failures,
             "verification_failures": self.verification_failures,
-            "concurrent_flush_blocked": self.concurrent_flush_blocked,  # P14
-            "in_flight_flushes": in_flight_count,  # P14
             "drain_mode": "normal",  # Will be updated by writer_task
         }
     

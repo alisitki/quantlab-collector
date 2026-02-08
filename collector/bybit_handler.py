@@ -63,7 +63,7 @@ class BybitHandler:
         """Establish WebSocket connection, subscribe, and listen."""
         print(f"[Bybit] Connecting...")
         
-        async with websockets.connect(BYBIT_WS_URL, ping_interval=20, ping_timeout=10) as ws:
+        async with websockets.connect(BYBIT_WS_URL, ping_interval=30, ping_timeout=30, close_timeout=10) as ws:
             self.ws = ws
             self.reconnect_delay = RECONNECT_DELAY
             print(f"[Bybit] Connected!")

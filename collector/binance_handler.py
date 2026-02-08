@@ -78,7 +78,14 @@ class BinanceHandler:
         
         print(f"[Binance] Connecting to {len(streams)} streams...")
         
-        async with websockets.connect(url, ping_interval=20, ping_timeout=10) as ws:
+        # P15: Increased ping_timeout from 10s to 30s to handle Binance server delays
+        # ping_interval=30s, ping_timeout=30s, close_timeout=10s for graceful close
+        async with websockets.connect(
+            url,
+            ping_interval=30,
+            ping_timeout=30,
+            close_timeout=10,
+        ) as ws:
             self.ws = ws
             self.reconnect_delay = RECONNECT_DELAY  # Reset on successful            
             print(f"[Binance] Connected!")
