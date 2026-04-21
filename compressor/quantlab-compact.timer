@@ -1,0 +1,11 @@
+[Unit]
+Description=QuantLab Daily Parquet Compaction Timer
+Requires=quantlab-compact.service
+
+[Timer]
+OnCalendar=*-*-* 02:30:00 UTC
+Persistent=true
+RandomizedDelaySec=300
+
+[Install]
+WantedBy=timers.target

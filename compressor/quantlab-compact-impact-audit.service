@@ -1,0 +1,20 @@
+[Unit]
+Description=QuantLab Compressor Impact Audit
+After=network-online.target quantlab-collector.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/quantlab
+EnvironmentFile=/opt/quantlab/.env
+Environment=PYTHONUNBUFFERED=1
+ExecStart=/usr/bin/python3 /opt/quantlab/compressor/run_impact_audit.py
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=quantlab-compact-impact-audit
+Nice=10
+
+[Install]
+WantedBy=multi-user.target

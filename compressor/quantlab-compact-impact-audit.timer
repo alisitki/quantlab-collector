@@ -1,0 +1,14 @@
+[Unit]
+Description=QuantLab Compressor Impact Audit Timer (3 days)
+Requires=quantlab-compact-impact-audit.service
+
+[Timer]
+Unit=quantlab-compact-impact-audit.service
+OnCalendar=2026-04-22 09:00:00 Europe/Istanbul
+OnCalendar=2026-04-23 09:00:00 Europe/Istanbul
+OnCalendar=2026-04-24 09:00:00 Europe/Istanbul
+AccuracySec=1m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

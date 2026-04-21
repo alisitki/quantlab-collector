@@ -1,0 +1,29 @@
+[Unit]
+Description=QuantLab Catch-Up Parquet Compaction Job
+After=network.target
+
+[Service]
+Type=oneshot
+User=root
+Group=root
+WorkingDirectory=/opt/quantlab
+EnvironmentFile=/opt/quantlab/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=COMPRESSOR_MAX_PARALLEL_DOWNLOADS=8
+Environment=COMPRESSOR_TMPDIR=/var/tmp/quantlab-compressor
+Environment=TMPDIR=/var/tmp/quantlab-compressor
+ExecStart=/usr/bin/python3 /opt/quantlab/compressor/run.py --mode catch-up --workers 1
+StandardOutput=journal
+StandardError=journal
+Restart=no
+SyslogIdentifier=quantlab-compact
+CPUQuota=40%
+MemoryMax=3G
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+KillSignal=SIGINT
+TimeoutStopSec=300
+
+[Install]
+WantedBy=multi-user.target
