@@ -21,6 +21,12 @@ class CompactErrorClassificationTest(unittest.TestCase):
             ("DICT_CONFLICT", "quarantine"),
         )
 
+    def test_invalid_thrift_is_quarantined_as_corrupt(self):
+        self.assertEqual(
+            classify_compaction_error("Couldn't deserialize thrift: invalid TType"),
+            ("SNAPPY_CORRUPT", "quarantine"),
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

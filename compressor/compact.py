@@ -48,7 +48,12 @@ def classify_compaction_error(message: str) -> Tuple[str, str]:
     lowered = (message or "").lower()
     if "more than one dictionary" in lowered:
         return "DICT_CONFLICT", "quarantine"
-    if "snappy" in lowered or "corrupt" in lowered:
+    if (
+        "snappy" in lowered
+        or "corrupt" in lowered
+        or "deserialize thrift" in lowered
+        or "invalid ttype" in lowered
+    ):
         return "SNAPPY_CORRUPT", "quarantine"
     if "too many open files" in lowered or "[errno 24]" in lowered:
         return "RESOURCE_LIMIT", "failed"
@@ -431,6 +436,7 @@ class CompactionJob:
             os.getenv("COMPRESSOR_TMPDIR") or os.getenv("TMPDIR") or tempfile.gettempdir()
         )
         self.temp_dir_base.mkdir(parents=True, exist_ok=True)
+        self._quality_cache: Dict[str, Dict[str, Any]] = {}
 
         # Diagnostics mapping
         self._path_to_s3_key = {}
@@ -840,6 +846,10 @@ class CompactionJob:
 
     def _fetch_quality_data(self, date_str: str) -> Dict:
         """Fetch all window JSONs for a date and aggregate quality"""
+        cached = self._quality_cache.get(date_str)
+        if cached is not None:
+            return dict(cached)
+
         quality_prefix = f"quality/date={date_str}/"
         paginator = self.s3_client_raw.get_paginator('list_objects_v2')
         window_results = []
@@ -857,7 +867,9 @@ class CompactionJob:
                     except Exception as e:
                         logger.error(f"Error reading quality window {obj['Key']}: {e}")
         
-        return QualityFilter.aggregate_day(window_results)
+        aggregated = QualityFilter.aggregate_day(window_results)
+        self._quality_cache[date_str] = aggregated
+        return dict(aggregated)
 
     def _ensure_temp_capacity(self, total_size_bytes: int):
         required_bytes = int(total_size_bytes * 2.2) + (2 * 1024 ** 3)

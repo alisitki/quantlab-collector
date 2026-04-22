@@ -1,0 +1,31 @@
+[Unit]
+Description=QuantLab Missing Compact Gap Backfill
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=root
+Group=root
+WorkingDirectory=/opt/quantlab
+EnvironmentFile=/opt/quantlab/.env
+Environment=PYTHONUNBUFFERED=1
+Environment=COMPRESSOR_MAX_PARALLEL_DOWNLOADS=8
+Environment=COMPRESSOR_MAX_OPEN_FILES=512
+Environment=COMPRESSOR_TMPDIR=/var/tmp/quantlab-compressor
+Environment=TMPDIR=/var/tmp/quantlab-compressor
+ExecStart=/usr/bin/python3 /opt/quantlab/compressor/run_gap_backfill.py --workers 1 --stop-before-hour-utc 1 --stop-before-minute-utc 30 --start-buffer-minutes 45
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=quantlab-compact-gap-backfill
+Nice=10
+CPUQuota=40%
+MemoryMax=3G
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+KillSignal=SIGINT
+TimeoutStopSec=300
+Restart=no
+
+[Install]
+WantedBy=multi-user.target
