@@ -103,7 +103,7 @@ def compressor_runs() -> List[CompressorRun]:
 
     for entry in entries:
         timestamp = ts_from_entry(entry)
-        message = entry.get("MESSAGE", "")
+        message = entry.get("MESSAGE") or ""
         if "Starting QuantLab Catch-Up Parquet Compaction Job" in message:
             if current is not None:
                 runs.append(current)

@@ -10,6 +10,7 @@ WorkingDirectory=/opt/quantlab
 EnvironmentFile=/opt/quantlab/.env
 Environment=PYTHONUNBUFFERED=1
 Environment=COMPRESSOR_MAX_PARALLEL_DOWNLOADS=8
+Environment=COMPRESSOR_MAX_OPEN_FILES=512
 Environment=COMPRESSOR_TMPDIR=/var/tmp/quantlab-compressor
 Environment=TMPDIR=/var/tmp/quantlab-compressor
 ExecStart=/usr/bin/python3 /opt/quantlab/compressor/run.py --mode catch-up --workers 1

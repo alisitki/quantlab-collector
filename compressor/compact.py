@@ -44,6 +44,19 @@ DEFAULT_MAX_PARALLEL_DOWNLOADS = 8
 STATE_FILE_KEY = "compacted/_state.json"
 
 
+def classify_compaction_error(message: str) -> Tuple[str, str]:
+    lowered = (message or "").lower()
+    if "more than one dictionary" in lowered:
+        return "DICT_CONFLICT", "quarantine"
+    if "snappy" in lowered or "corrupt" in lowered:
+        return "SNAPPY_CORRUPT", "quarantine"
+    if "too many open files" in lowered or "[errno 24]" in lowered:
+        return "RESOURCE_LIMIT", "failed"
+    if "insufficient temporary space" in lowered:
+        return "INSUFFICIENT_TMP_SPACE", "failed"
+    return "OTHER", "quarantine"
+
+
 class InsufficientTempSpaceError(RuntimeError):
     """Raised when the temporary directory cannot safely hold a partition."""
 
@@ -648,15 +661,7 @@ class CompactionJob:
             result['stacktrace'] = traceback.format_exc()
             
             # Identify Error Type
-            error_type = "OTHER"
-            failure_status = "quarantine"
-            if "more than one dictionary" in msg.lower():
-                error_type = "DICT_CONFLICT"
-            elif "snappy" in msg.lower() or "corrupt" in msg.lower():
-                error_type = "SNAPPY_CORRUPT"
-            elif "insufficient temporary space" in msg.lower():
-                error_type = "INSUFFICIENT_TMP_SPACE"
-                failure_status = "failed"
+            error_type, failure_status = classify_compaction_error(msg)
             result['error_type'] = error_type
             result['status'] = failure_status
             
@@ -688,7 +693,9 @@ class CompactionJob:
                 )
             result['reproducer_cmd'] = reproducer
             
-            q_tag = Colors.colorate("[QUARANTINE]", Colors.YELLOW)
+            status_label = "[FAILED]" if failure_status == "failed" else "[QUARANTINE]"
+            status_color = Colors.RED if failure_status == "failed" else Colors.YELLOW
+            q_tag = Colors.colorate(status_label, status_color)
             logger.error(f"{q_tag} {symbol} {stream} {date} | ERROR_TYPE={error_type}")
             if failing_key:
                 logger.error(f"  -> FAILING_RAW_KEY={failing_key}")
@@ -782,6 +789,7 @@ class CompactionJob:
     
     def _verify_output_integrity(self, path: Path, expected_rows: int):
         """Verify that output parquet is readable and has expected row count."""
+        pf = None
         try:
             pf = pq.ParquetFile(path)
             actual_rows = 0
@@ -798,6 +806,12 @@ class CompactionJob:
                     raise ValueError("Invalid parquet footer magic")
         except Exception as e:
             raise ValueError(f"Post-write verification failed: {e}") from e
+        finally:
+            if pf is not None:
+                try:
+                    pf.close()
+                except Exception:
+                    pass
     
     def _upload_json_to_s3(self, content: dict, s3_key: str):
         self.s3_client_compact.put_object(

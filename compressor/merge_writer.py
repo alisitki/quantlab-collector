@@ -10,6 +10,7 @@ Algorithm:
 """
 
 import heapq
+import os
 import time
 import logging
 import shutil
@@ -28,7 +29,19 @@ logger = logging.getLogger(__name__)
 MERGE_BATCH_SIZE = 100_000          # Rows per input batch
 MERGE_OUTPUT_BUFFER_SIZE = 200_000  # Rows before flush to writer
 MERGE_LOG_INTERVAL = 5_000_000      # Log progress every N rows
-MAX_OPEN_FILES = 1200               # Max files to open simultaneously (safe for ulimit)
+MAX_OPEN_FILES = max(
+    32,
+    int(os.getenv("COMPRESSOR_MAX_OPEN_FILES", "512")),
+)                                   # Bound open parquet handles per merge stage.
+
+
+def _close_parquet_file(parquet_file) -> None:
+    if parquet_file is None:
+        return
+    try:
+        parquet_file.close()
+    except Exception:
+        pass
 
 
 class FileStream:
@@ -191,10 +204,9 @@ class FileStream:
     
     def close(self):
         """Close the parquet file."""
-        try:
-            self.pf.close()
-        except:
-            pass
+        _close_parquet_file(self.pf)
+        self.current_batch = None
+        self.batch_iter = None
 
 
 class HeapEntry:
@@ -368,24 +380,31 @@ class StreamingMergeWriter:
         try:
             prev_max = -1
             for path in self.input_files:
-                pf = pq.ParquetFile(path)
-                ts_idx = -1
-                for i, name in enumerate(pf.schema_arrow.names):
-                    if name == 'ts_event': ts_idx = i; break
-                if ts_idx == -1: return False, "missing_ts_event"
-                
-                # Check row group statistics
-                stats = pf.metadata.row_group(0).column(ts_idx).statistics
-                if not stats or not stats.has_min_max: 
-                    return False, f"missing_stats:{path.name}"
-                
-                f_min = stats.min
-                f_max = stats.max
-                
-                if f_min < prev_max:
-                    return False, f"overlap:current_min({f_min}) < prev_max({prev_max}) at {path.name}"
-                
-                prev_max = f_max
+                pf = None
+                try:
+                    pf = pq.ParquetFile(path)
+                    ts_idx = -1
+                    for i, name in enumerate(pf.schema_arrow.names):
+                        if name == 'ts_event':
+                            ts_idx = i
+                            break
+                    if ts_idx == -1:
+                        return False, "missing_ts_event"
+
+                    # Check row group statistics
+                    stats = pf.metadata.row_group(0).column(ts_idx).statistics
+                    if not stats or not stats.has_min_max:
+                        return False, f"missing_stats:{path.name}"
+
+                    f_min = stats.min
+                    f_max = stats.max
+
+                    if f_min < prev_max:
+                        return False, f"overlap:current_min({f_min}) < prev_max({prev_max}) at {path.name}"
+
+                    prev_max = f_max
+                finally:
+                    _close_parquet_file(pf)
             return True, "strictly_ordered"
         except Exception as e:
             return False, f"error:{str(e)}"
@@ -393,10 +412,12 @@ class StreamingMergeWriter:
     def _fast_concat(self) -> Dict:
         """Fast path for non-overlapping files."""
         t0 = time.perf_counter()
+        first_pf = None
         first_pf = pq.ParquetFile(self.input_files[0])
         base_schema = first_pf.schema_arrow
         if self.force_plain_output:
             base_schema = self._plain_schema(base_schema)
+        _close_parquet_file(first_pf)
         ts_pos = -1
         
         if self.add_seq_column:
@@ -421,24 +442,28 @@ class StreamingMergeWriter:
         
         for path in self.input_files:
             if self.check_shutdown(): raise InterruptedError()
-            pf = pq.ParquetFile(path)
-            ts_idx = [j for j, n in enumerate(pf.schema_arrow.names) if n == 'ts_event'][0]
-            stats = pf.metadata.row_group(0).column(ts_idx).statistics
-            if stats:
-                if self.ts_event_min is None or stats.min < self.ts_event_min: self.ts_event_min = stats.min
-                if self.ts_event_max is None or stats.max > self.ts_event_max: self.ts_event_max = stats.max
-                
-            for batch in pf.iter_batches(batch_size=self.batch_size):
-                if self.force_plain_output:
-                    batch = self._plain_batch(batch)
-                if self.add_seq_column:
-                    seq_arr = pa.array(range(seq, seq + batch.num_rows), type=pa.int64())
-                    arrays = [batch.column(j) for j in range(batch.num_columns)]
-                    arrays.insert(ts_pos + 1, seq_arr)
-                    batch = pa.RecordBatch.from_arrays(arrays, schema=self.schema)
-                    seq += batch.num_rows
-                self.writer.write_batch(batch)
-                self.rows_written += batch.num_rows
+            pf = None
+            try:
+                pf = pq.ParquetFile(path)
+                ts_idx = [j for j, n in enumerate(pf.schema_arrow.names) if n == 'ts_event'][0]
+                stats = pf.metadata.row_group(0).column(ts_idx).statistics
+                if stats:
+                    if self.ts_event_min is None or stats.min < self.ts_event_min: self.ts_event_min = stats.min
+                    if self.ts_event_max is None or stats.max > self.ts_event_max: self.ts_event_max = stats.max
+
+                for batch in pf.iter_batches(batch_size=self.batch_size):
+                    if self.force_plain_output:
+                        batch = self._plain_batch(batch)
+                    if self.add_seq_column:
+                        seq_arr = pa.array(range(seq, seq + batch.num_rows), type=pa.int64())
+                        arrays = [batch.column(j) for j in range(batch.num_columns)]
+                        arrays.insert(ts_pos + 1, seq_arr)
+                        batch = pa.RecordBatch.from_arrays(arrays, schema=self.schema)
+                        seq += batch.num_rows
+                    self.writer.write_batch(batch)
+                    self.rows_written += batch.num_rows
+            finally:
+                _close_parquet_file(pf)
             
         self.writer.close()
         self.t_loop = time.perf_counter() - t0

@@ -30,6 +30,18 @@ class StateSemanticsTest(unittest.TestCase):
             entry_counts_as_complete({"status": "success", "counts_as_complete": False})
         )
 
+    def test_resource_limit_error_is_never_complete(self):
+        self.assertFalse(
+            entry_counts_as_complete(
+                {
+                    "status": "quarantine",
+                    "counts_as_complete": True,
+                    "error_type": "RESOURCE_LIMIT",
+                    "error": "Too many open files",
+                }
+            )
+        )
+
     def test_day_results_must_all_be_complete(self):
         self.assertTrue(
             partition_results_are_complete(
