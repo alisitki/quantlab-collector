@@ -3,7 +3,7 @@ Description=QuantLab Missing Compact Gap Backfill Timer
 
 [Timer]
 Unit=quantlab-compact-gap-backfill.service
-OnCalendar=*-*-* 09:15:00 Europe/Istanbul
+OnCalendar=*-*-* 15:15:00 UTC
 Persistent=true
 AccuracySec=5m
 

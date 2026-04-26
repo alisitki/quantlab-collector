@@ -1,29 +1,29 @@
 {
-  "generated_at_utc": "2026-04-24T06:15:18.398784+00:00",
-  "today": "20260424",
-  "raw_partitions": 14619,
-  "compact_complete_partitions": 10618,
-  "missing_partitions": 4001,
-  "retryable_dates": 69,
-  "retryable_partitions": 1605,
-  "hard_failure_dates": 29,
-  "hard_failure_partitions": 2396,
+  "generated_at_utc": "2026-04-26T06:15:19.290644+00:00",
+  "today": "20260426",
+  "raw_partitions": 14827,
+  "compact_complete_partitions": 10960,
+  "missing_partitions": 3867,
+  "retryable_dates": 53,
+  "retryable_partitions": 1205,
+  "hard_failure_dates": 31,
+  "hard_failure_partitions": 2662,
   "retryable_statuses": {
-    "quarantine": 407,
-    "missing_state": 1198
+    "quarantine": 273,
+    "missing_state": 932
   },
   "hard_statuses": {
-    "quarantine": 2396
+    "quarantine": 2662
   },
   "retryable_reasons": {
-    "state_retryable": 407,
-    "missing_state": 1198
+    "state_retryable": 273,
+    "missing_state": 932
   },
   "hard_reasons": {
     "error_text:corrupt_or_dict_conflict": 18,
     "error_type:dict_conflict": 521,
     "error_type:snappy_corrupt": 527,
-    "day_quality:bad": 1330
+    "day_quality:bad": 1596
   },
   "retryable_by_date": {
     "20260105": [
@@ -242,4039 +242,7 @@
         "classification_reason": "state_retryable"
       }
     ],
-    "20260223": [
-      {
-        "date": "20260223",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260223",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260224": [
-      {
-        "date": "20260224",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260224",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260225": [
-      {
-        "date": "20260225",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260225",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260226": [
-      {
-        "date": "20260226",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260226",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260227": [
-      {
-        "date": "20260227",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260227",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260228": [
-      {
-        "date": "20260228",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260228",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260301": [
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260301",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      }
-    ],
-    "20260302": [
-      {
-        "date": "20260302",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260302",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260303": [
-      {
-        "date": "20260303",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260303",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260304": [
-      {
-        "date": "20260304",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260304",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260305": [
-      {
-        "date": "20260305",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260305",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260306": [
-      {
-        "date": "20260306",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260306",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260307": [
-      {
-        "date": "20260307",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260307",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260307",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260307",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260307",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260308": [
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "funding",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "mark_price",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "bbo",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "funding",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "mark_price",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "open_interest",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "bbo",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "funding",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "mark_price",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "open_interest",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "adausdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "avaxusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "bnbusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "linkusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ltcusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "maticusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      },
-      {
-        "date": "20260308",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "xrpusdt",
-        "state_status": "missing_state",
-        "error_type": null,
-        "day_quality": null,
-        "classification_reason": "missing_state"
-      }
-    ],
-    "20260309": [
-      {
-        "date": "20260309",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260309",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
-    "20260310": [
-      {
-        "date": "20260310",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "binance",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "bybit",
-        "stream": "trade",
-        "symbol": "solusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260310",
-        "exchange": "okx",
-        "stream": "trade",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      }
-    ],
     "20260311": [
-      {
-        "date": "20260311",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "btcusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
-      {
-        "date": "20260311",
-        "exchange": "binance",
-        "stream": "bbo",
-        "symbol": "ethusdt",
-        "state_status": "quarantine",
-        "error_type": "OTHER",
-        "day_quality": null,
-        "classification_reason": "state_retryable"
-      },
       {
         "date": "20260311",
         "exchange": "binance",
@@ -40225,6 +36193,2670 @@
       },
       {
         "date": "20260207",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      }
+    ],
+    "20260301": [
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260301",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      }
+    ],
+    "20260308": [
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "bbo",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "funding",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "mark_price",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "binance",
+        "stream": "trade",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "bbo",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "funding",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "mark_price",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "open_interest",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "bybit",
+        "stream": "trade",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "bbo",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "funding",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "mark_price",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "open_interest",
+        "symbol": "xrpusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "adausdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "avaxusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "bnbusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "btcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "ethusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "linkusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "ltcusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "maticusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
+        "exchange": "okx",
+        "stream": "trade",
+        "symbol": "solusdt",
+        "state_status": "quarantine",
+        "error_type": null,
+        "day_quality": "BAD",
+        "classification_reason": "day_quality:bad"
+      },
+      {
+        "date": "20260308",
         "exchange": "okx",
         "stream": "trade",
         "symbol": "xrpusdt",
