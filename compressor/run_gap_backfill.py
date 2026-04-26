@@ -21,6 +21,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dotenv import load_dotenv
 
 from compact import CompactionJob, Colors, logger
+from manifest_state import get_entry, is_v2_state
 
 UTC = timezone.utc
 DEFAULT_STOP_BEFORE_HOUR_UTC = 1
@@ -74,10 +75,15 @@ def classify_missing_partition(entry: Optional[Dict[str, Any]]) -> Tuple[str, st
     if not entry:
         return "retryable", "missing_state"
 
+    if "availability" in entry:
+        reason = entry.get("reason_code", "unknown")
+        if entry.get("retryable"):
+            return "retryable", f"reason_code:{reason}"
+        return "hard_failure", f"reason_code:{reason}"
+
     error_type = entry.get("error_type")
     error_text = str(entry.get("error") or "").lower()
     day_quality = entry.get("day_quality")
-
     if day_quality in {"BAD", "PARTIAL"}:
         return "hard_failure", f"day_quality:{day_quality.lower()}"
     if error_type in HARD_FAILURE_ERROR_TYPES:
@@ -151,7 +157,6 @@ class GapScanner:
         compact_parts = self.compact_artifacts()
         missing_parts = sorted(raw_parts - compact_parts)
         state = self.job.state_manager._read_state()
-        state_parts = state.get("partitions", {})
 
         retryable_by_date: DefaultDict[str, List[Dict[str, str]]] = defaultdict(list)
         hard_by_date: DefaultDict[str, List[Dict[str, str]]] = defaultdict(list)
@@ -161,10 +166,9 @@ class GapScanner:
         hard_reasons = Counter()
 
         for date, exchange, stream, symbol in missing_parts:
-            key = f"{exchange}/{stream}/{symbol}/{date}"
-            entry = state_parts.get(key)
+            entry = get_entry(state, date, exchange, stream, symbol) if is_v2_state(state) else state.get("partitions", {}).get(f"{exchange}/{stream}/{symbol}/{date}")
             kind, reason = classify_missing_partition(entry)
-            state_status = (entry or {}).get("status", "missing_state")
+            state_status = (entry or {}).get("reason_code") or (entry or {}).get("status", "missing_state")
             item = {
                 "date": date,
                 "exchange": exchange,
@@ -273,6 +277,7 @@ def main() -> int:
         compact_bucket=compact_bucket,
     )
     job.check_shutdown = lambda: shutdown_requested
+    job.sync_manifest_state(today)
 
     scanner = GapScanner(job, today)
     scan = scanner.scan()

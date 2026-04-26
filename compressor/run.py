@@ -14,7 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent))
 from dotenv import load_dotenv
 from compact import CompactionJob, get_today_date, get_yesterday_date, format_bytes, logger, Colors
 from backfill_planner import BackfillPlanner
-from state_semantics import entry_counts_as_complete, partition_results_are_complete
+from manifest_state import day_fetch_ready
 
 import argparse
 from datetime import datetime, timedelta, timezone
@@ -232,6 +232,7 @@ def main():
         perform_wipe(args.apply)
         sys.exit(0)
     
+    job.sync_manifest_state(get_today_date())
     job.state_manager.cleanup_stale_locks()
     
     if args.quality_report:
@@ -278,6 +279,7 @@ def main():
             curr += timedelta(days=1)
             
         logger.info(f"CLEANUP MODE | Range: {start} to {end} | Apply: {args.apply}")
+        cleanup_changed = False
         for date in dates:
             partitions = job.discover_partitions_for_date(date)
             for p in partitions:
@@ -291,12 +293,11 @@ def main():
                     resp = job.s3_client_compact.list_objects_v2(Bucket=compact_bucket, Prefix=prefix)
                     for obj in resp.get('Contents', []):
                         job.s3_client_compact.delete_object(Bucket=compact_bucket, Key=obj['Key'])
-                    state = job.state_manager._read_state()
-                    key = f"{p['exchange']}/{p['stream']}/{p['symbol']}/{date}"
-                    if key in state.get("partitions", {}):
-                        del state["partitions"][key]
-                        job.s3_client_compact.put_object(Bucket=compact_bucket, Key="compacted/_state.json", Body=json.dumps(state, indent=2).encode('utf-8'))
+                    cleanup_changed = True
                 else: logger.info("DRY-RUN: Use --apply to execute.")
+        if args.apply and cleanup_changed:
+            job.invalidate_manifest_caches()
+            job.sync_manifest_state(today, force=True)
         sys.exit(0)
 
     # Date Planning
@@ -379,7 +380,9 @@ def main():
             logger.warning(Colors.colorate(f"DAY QUARANTINE: {target_date} (Quality is BAD)", Colors.YELLOW))
             job.state_manager.log_day_status(target_date, 'quarantine')
             if not args.overwrite and args.mode not in ['backfill', 'quicktest'] and advance_cursor_open:
-                job.state_manager.update_last_compacted_date(target_date)
+                state = job.state_manager._read_state()
+                if day_fetch_ready(state, target_date):
+                    job.state_manager.update_last_compacted_date(target_date)
             continue
             
         partitions = job.discover_partitions_for_date(target_date)
@@ -477,7 +480,7 @@ def main():
                     total_in += res.get('total_size_bytes', 0)
                     total_out += res.get('output_size_bytes', 0)
                 
-                if (st == 'quarantine' and res.get('error')) or not entry_counts_as_complete(res):
+                if st in {'failed', 'partial', 'aborted', 'download_failed', 'no_files', 'in_progress', 'locked'}:
                     job_success = False
                 if res.get('error'):
                     failed_results.append(res)
@@ -505,7 +508,8 @@ def main():
             ratio = (total_out / total_in) * 100
             logger.info(f"Stats: {format_bytes(total_in)} -> {format_bytes(total_out)} ({ratio:.1f}%) | {duration:.1f}s")
 
-        day_complete = partition_results_are_complete(day_results)
+        state = job.state_manager._read_state()
+        day_complete = day_fetch_ready(state, target_date)
         if (
             not args.overwrite
             and args.mode not in ['backfill', 'quicktest']

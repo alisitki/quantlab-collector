@@ -10,6 +10,7 @@ import json
 import socket
 import shutil
 import uuid
+from copy import deepcopy
 from pathlib import Path
 from typing import List, Dict, Optional, Set, Tuple, Any, Callable
 from datetime import datetime, timedelta, timezone
@@ -27,7 +28,45 @@ import pyarrow.parquet as pq
 # Streaming k-way merge for bounded memory compaction
 from merge_writer import StreamingMergeWriter
 from quality_filter import QualityFilter, POST_FILTER_VERSION
-from state_semantics import entry_counts_as_complete
+from manifest_state import (
+    AVAILABLE,
+    EXPECTED_STREAMS,
+    EXPECTED_SYMBOLS,
+    PENDING,
+    REASON_ALWAYS_MISSING_COMBO,
+    REASON_ARTIFACT_MISSING,
+    REASON_COMPACTION_FAILED,
+    REASON_COMPACTION_QUARANTINED,
+    REASON_IN_PROGRESS,
+    REASON_LOCKED,
+    REASON_MISSING_RAW,
+    REASON_QUALITY_BAD,
+    REASON_QUALITY_PARTIAL,
+    REASON_RESOURCE_LIMIT,
+    REASON_SUCCESS,
+    REASON_STALLED,
+    STATE_SCHEMA_VERSION,
+    availability_entry,
+    artifact_keys,
+    base_state,
+    build_consumer_manifest,
+    ensure_date_grid,
+    entry_is_pending,
+    entry_is_retryable,
+    extract_legacy_day_overrides,
+    extract_known_day_quality,
+    extract_progress_seed,
+    extract_state_overrides,
+    get_entry,
+    is_v2_state,
+    manifest_status,
+    recompute_progress,
+    preserve_progress_seed,
+    result_to_manifest_entry,
+    set_entry,
+    summarize_date,
+    utc_now_iso,
+)
 
 # Configure logging
 logging.basicConfig(
@@ -42,6 +81,14 @@ logging.getLogger('botocore').setLevel(logging.ERROR)
 
 DEFAULT_MAX_PARALLEL_DOWNLOADS = 8
 STATE_FILE_KEY = "compacted/_state.json"
+
+
+def manifest_key_for_state_key(state_key: str) -> str:
+    if state_key.endswith("_state.json"):
+        return state_key[:-11] + "_manifest.json"
+    if state_key.endswith(".json"):
+        return state_key[:-5] + ".manifest.json"
+    return f"{state_key}.manifest"
 
 
 def classify_compaction_error(message: str) -> Tuple[str, str]:
@@ -87,9 +134,28 @@ class StateManager:
         self.s3_client = s3_client
         self.bucket = bucket
         self.state_key = state_key
+        self.manifest_key = manifest_key_for_state_key(state_key)
         # Serialize updates to the shared state document across multiple workers/processes.
         # Without this, parallel workers can clobber each other's writes (last-write-wins).
         self.state_lock_key = f"{state_key}.lock"
+
+    def _write_state_documents(self, state: Dict[str, Any]) -> None:
+        manifest = build_consumer_manifest(state)
+        self.s3_client.put_object(
+            Bucket=self.bucket,
+            Key=self.state_key,
+            Body=json.dumps(state, indent=2).encode("utf-8"),
+            ContentType="application/json",
+        )
+        self.s3_client.put_object(
+            Bucket=self.bucket,
+            Key=self.manifest_key,
+            Body=json.dumps(manifest, indent=2).encode("utf-8"),
+            ContentType="application/json",
+        )
+
+    def persist_state(self, state: Dict[str, Any]) -> None:
+        self._write_state_documents(state)
 
     def _acquire_state_lock(self, wait_seconds: float = 30.0, ttl_seconds: float = 120.0) -> Optional[str]:
         """
@@ -167,13 +233,10 @@ class StateManager:
         token = self._acquire_state_lock()
         try:
             state = self._read_state()
+            progress_seed = extract_progress_seed(state)
             mutate_fn(state)
-            self.s3_client.put_object(
-                Bucket=self.bucket,
-                Key=self.state_key,
-                Body=json.dumps(state, indent=2).encode("utf-8"),
-                ContentType="application/json",
-            )
+            preserve_progress_seed(state, progress_seed)
+            self._write_state_documents(state)
         finally:
             if token:
                 self._release_state_lock(token)
@@ -183,6 +246,8 @@ class StateManager:
         try:
             resp = self.s3_client.get_object(Bucket=self.bucket, Key=self.state_key)
             state = json.loads(resp['Body'].read().decode('utf-8'))
+            if is_v2_state(state):
+                return state.get("progress", {}).get("last_complete_date")
             return state.get('last_compacted_date')
         except ClientError as e:
             if e.response['Error']['Code'] == 'NoSuchKey':
@@ -195,61 +260,62 @@ class StateManager:
     def update_last_compacted_date(self, date_str: str):
         """Update last_compacted_date and current timestamp in S3 for audit"""
         def mutate(state: Dict):
-            state["last_compacted_date"] = date_str
-            state["updated_at"] = datetime.utcnow().isoformat() + "Z"
+            if is_v2_state(state):
+                state.setdefault("progress", {})["last_complete_date"] = date_str
+                state["updated_at"] = utc_now_iso()
+            else:
+                state["last_compacted_date"] = date_str
+                state["updated_at"] = datetime.utcnow().isoformat() + "Z"
 
         self._update_state(mutate)
-        logger.info(f"Updated state: last_compacted_date={date_str}")
+        logger.info(f"Updated state: last_complete_date={date_str}")
         
     def log_partition_status(self, result: Dict, status: Optional[str] = None):
         """Log individual partition results into state history"""
         def mutate(state: Dict):
-            if "partitions" not in state:
-                state["partitions"] = {}
-
-            key = f"{result['exchange']}/{result['stream']}/{result['symbol']}/{result['date']}"
+            if not is_v2_state(state):
+                state.clear()
+                state.update(base_state())
             final_status = status or result.get("status", "unknown")
-
-            entry = {
-                "status": final_status,
-                "counts_as_complete": entry_counts_as_complete({
-                    "status": final_status,
-                    "day_quality": result.get("day_quality"),
-                    "error": result.get("error"),
-                    "skip_reason": result.get("skip_reason"),
-                }),
-                "day_quality": result.get("day_quality"),
-                "post_filter_version": result.get("post_filter_version", "1.0.0"),
-                "rows": result.get("rows", 0),
-                "total_size_bytes": result.get("total_size_bytes", 0),
-                "updated_at": datetime.utcnow().isoformat() + "Z",
-            }
-
-            # Persist minimal diagnostics to prevent re-work and aid triage.
-            if result.get("skip_reason"):
-                entry["skip_reason"] = result.get("skip_reason")
-            if result.get("error_type"):
-                entry["error_type"] = result.get("error_type")
-            if result.get("failing_key"):
-                entry["failing_key"] = result.get("failing_key")
-            if result.get("error"):
-                entry["error"] = str(result.get("error"))[:2000]
-
-            state["partitions"][key] = entry
+            entry = result_to_manifest_entry(result, final_status)
+            set_entry(
+                state,
+                result["date"],
+                result["exchange"],
+                result["stream"],
+                result["symbol"],
+                entry,
+            )
+            summarize_date(state, result["date"], updated_at=entry["updated_at"])
+            state["updated_at"] = entry["updated_at"]
+            recompute_progress(state)
 
         self._update_state(mutate)
 
     def log_day_status(self, date: str, status: str):
         """Log day-level status (useful for skipping BAD days entirely)"""
         def mutate(state: Dict):
-            if "days" not in state:
-                state["days"] = {}
-
-            state["days"][date] = {
-                "status": status,
-                "counts_as_complete": entry_counts_as_complete({"status": status}),
-                "updated_at": datetime.utcnow().isoformat() + "Z",
-            }
+            if not is_v2_state(state):
+                state.clear()
+                state.update(base_state())
+            updated_at = utc_now_iso()
+            day = ensure_date_grid(state, date, updated_at=updated_at)
+            reason_code = REASON_QUALITY_BAD if status == "quarantine" else REASON_QUALITY_PARTIAL
+            retryable = reason_code == REASON_QUALITY_PARTIAL
+            for exchange, ex_data in day.get("exchanges", {}).items():
+                for stream, st_data in ex_data.get("streams", {}).items():
+                    for symbol, entry in st_data.get("symbols", {}).items():
+                        if entry.get("availability") == AVAILABLE:
+                            continue
+                        st_data["symbols"][symbol] = {
+                            "availability": "unavailable",
+                            "retryable": retryable,
+                            "reason_code": reason_code,
+                            "updated_at": updated_at,
+                        }
+            summarize_date(state, date, updated_at=updated_at)
+            state["updated_at"] = updated_at
+            recompute_progress(state)
 
         self._update_state(mutate)
 
@@ -304,7 +370,7 @@ class StateManager:
         token = self._acquire_state_lock()
         try:
             state = self._read_state()
-            partitions = state.get("partitions", {})
+            progress_seed = extract_progress_seed(state)
 
             resp = self.s3_client.list_objects_v2(Bucket=self.bucket, Prefix=prefix)
             locks = resp.get("Contents", [])
@@ -325,15 +391,15 @@ class StateManager:
                 if target_date and p_date != target_date:
                     continue
 
-                p_key = rel_path
-                entry = partitions.get(p_key)
+                exchange, stream, symbol = parts[0], parts[1], parts[2]
+                entry = get_entry(state, p_date, exchange, stream, symbol)
 
                 lock_stale = False
                 trigger_reason = ""
 
-                if not entry or entry.get("status") != "in_progress":
+                if not entry or manifest_status(entry) != "in_progress":
                     lock_stale = True
-                    trigger_reason = f"Status is {entry.get('status') if entry else 'missing'}"
+                    trigger_reason = f"Status is {manifest_status(entry) if entry else 'missing'}"
                 else:
                     updated_at_str = entry.get("updated_at", "").replace("Z", "+00:00")
                     try:
@@ -341,8 +407,9 @@ class StateManager:
                         if updated_at < ttl_limit:
                             lock_stale = True
                             trigger_reason = f"Progress STALLED since {updated_at_str}"
-                            entry["status"] = "stalled"
-                            entry["counts_as_complete"] = False
+                            entry["availability"] = PENDING
+                            entry["retryable"] = True
+                            entry["reason_code"] = REASON_STALLED
                             entry["updated_at"] = now.isoformat() + "Z"
                             changed = True
                     except Exception:
@@ -353,12 +420,12 @@ class StateManager:
                     self.s3_client.delete_object(Bucket=self.bucket, Key=lock_key)
 
             if changed:
-                self.s3_client.put_object(
-                    Bucket=self.bucket,
-                    Key=self.state_key,
-                    Body=json.dumps(state, indent=2).encode("utf-8"),
-                    ContentType="application/json",
-                )
+                for date in sorted(state.get("dates", {})):
+                    summarize_date(state, date)
+                state["updated_at"] = utc_now_iso()
+                recompute_progress(state)
+                preserve_progress_seed(state, progress_seed)
+                self._write_state_documents(state)
         except Exception as e:
             logger.error(f"Error during stale lock cleanup: {e}")
         finally:
@@ -368,8 +435,11 @@ class StateManager:
     def get_partition_status(self, result: Dict) -> Tuple[Optional[str], Optional[datetime]]:
         """Get current status and timestamp for a partition"""
         state = self._read_state()
-        key = f"{result['exchange']}/{result['stream']}/{result['symbol']}/{result['date']}"
-        entry = state.get("partitions", {}).get(key)
+        if is_v2_state(state):
+            entry = get_entry(state, result["date"], result["exchange"], result["stream"], result["symbol"])
+        else:
+            key = f"{result['exchange']}/{result['stream']}/{result['symbol']}/{result['date']}"
+            entry = state.get("partitions", {}).get(key)
         if not entry:
             return None, None
         
@@ -379,7 +449,7 @@ class StateManager:
                 updated_at = datetime.fromisoformat(entry["updated_at"].replace('Z', '+00:00'))
             except:
                 pass
-        return entry.get("status"), updated_at
+        return manifest_status(entry), updated_at
 
 
     def _read_state(self) -> Dict:
@@ -437,9 +507,207 @@ class CompactionJob:
         )
         self.temp_dir_base.mkdir(parents=True, exist_ok=True)
         self._quality_cache: Dict[str, Dict[str, Any]] = {}
+        self._manifest_raw_partitions_cache: Optional[Set[Tuple[str, str, str, str]]] = None
+        self._manifest_artifact_cache: Optional[Dict[Tuple[str, str, str, str], Dict[str, str]]] = None
+        self._manifest_today_cache: Optional[str] = None
 
         # Diagnostics mapping
         self._path_to_s3_key = {}
+
+    def _list_prefixes(self, s3_client, bucket: str, prefix: str) -> List[str]:
+        paginator = s3_client.get_paginator('list_objects_v2')
+        prefixes = []
+        for page in paginator.paginate(Bucket=bucket, Prefix=prefix, Delimiter='/'):
+            prefixes.extend(cp['Prefix'] for cp in page.get('CommonPrefixes', []))
+        return prefixes
+
+    def _scan_raw_partitions_before(self, today: str) -> Set[Tuple[str, str, str, str]]:
+        if self._manifest_raw_partitions_cache is not None and self._manifest_today_cache == today:
+            return set(self._manifest_raw_partitions_cache)
+
+        partitions: Set[Tuple[str, str, str, str]] = set()
+        for ex_prefix in self._list_prefixes(self.s3_client_raw, self.raw_bucket, "exchange="):
+            exchange = ex_prefix.rstrip('/').split('/')[-1].split('=', 1)[1]
+            for st_prefix in self._list_prefixes(self.s3_client_raw, self.raw_bucket, ex_prefix + "stream="):
+                stream = st_prefix.rstrip('/').split('/')[-1].split('=', 1)[1]
+                for sy_prefix in self._list_prefixes(self.s3_client_raw, self.raw_bucket, st_prefix + "symbol="):
+                    symbol = sy_prefix.rstrip('/').split('/')[-1].split('=', 1)[1]
+                    for d_prefix in self._list_prefixes(self.s3_client_raw, self.raw_bucket, sy_prefix + "date="):
+                        date = d_prefix.rstrip('/').split('/')[-1].split('=', 1)[1]
+                        if len(date) == 8 and date.isdigit() and date < today:
+                            partitions.add((date, exchange, stream, symbol))
+
+        self._manifest_raw_partitions_cache = set(partitions)
+        self._manifest_today_cache = today
+        return partitions
+
+    def _scan_compact_artifacts_before(self, today: str) -> Dict[Tuple[str, str, str, str], Dict[str, str]]:
+        if self._manifest_artifact_cache is not None and self._manifest_today_cache == today:
+            return dict(self._manifest_artifact_cache)
+
+        artifact_map: Dict[Tuple[str, str, str, str], Dict[str, str]] = {}
+        paginator = self.s3_client_compact.get_paginator("list_objects_v2")
+        for page in paginator.paginate(Bucket=self.compact_bucket, Prefix="exchange="):
+            for obj in page.get("Contents", []):
+                key = obj["Key"]
+                if not key.endswith((".parquet", ".json")):
+                    continue
+                parts = [part for part in key.split("/") if part]
+                if len(parts) != 5:
+                    continue
+                try:
+                    exchange = parts[0].split("=", 1)[1]
+                    stream = parts[1].split("=", 1)[1]
+                    symbol = parts[2].split("=", 1)[1]
+                    date = parts[3].split("=", 1)[1]
+                except Exception:
+                    continue
+                if date >= today:
+                    continue
+                bucket_entry = artifact_map.setdefault((date, exchange, stream, symbol), {})
+                if key.endswith("/data.parquet"):
+                    bucket_entry["data_key"] = key
+                elif key.endswith("/meta.json"):
+                    bucket_entry["meta_key"] = key
+                elif key.endswith("/quality_day.json"):
+                    bucket_entry["quality_day_key"] = key
+
+        artifact_map = {
+            key: value
+            for key, value in artifact_map.items()
+            if {"data_key", "meta_key", "quality_day_key"} <= set(value)
+        }
+        self._manifest_artifact_cache = dict(artifact_map)
+        self._manifest_today_cache = today
+        return artifact_map
+
+    def invalidate_manifest_caches(self, date: Optional[str] = None):
+        del date
+        self._manifest_raw_partitions_cache = None
+        self._manifest_artifact_cache = None
+        self._manifest_today_cache = None
+
+    def _build_manifest_state(self, existing_state: Dict[str, Any], today: str) -> Dict[str, Any]:
+        state = base_state()
+        overrides = extract_state_overrides(existing_state)
+        day_overrides = extract_legacy_day_overrides(existing_state)
+        known_day_quality = extract_known_day_quality(existing_state)
+        progress_seed = extract_progress_seed(existing_state)
+        raw_parts = self._scan_raw_partitions_before(today)
+        artifacts = self._scan_compact_artifacts_before(today)
+
+        raw_combo_dates: Dict[Tuple[str, str, str], Set[str]] = {}
+        all_dates: Set[str] = set()
+        for date, exchange, stream, symbol in raw_parts:
+            all_dates.add(date)
+            raw_combo_dates.setdefault((exchange, stream, symbol), set()).add(date)
+        for date, _, _, _ in artifacts:
+            all_dates.add(date)
+        for date, _, _, _ in overrides:
+            if date < today:
+                all_dates.add(date)
+        for date in day_overrides:
+            if date < today:
+                all_dates.add(date)
+
+        for date in sorted(all_dates):
+            day = ensure_date_grid(state, date)
+            day_quality = known_day_quality.get(date)
+            if day_quality is None:
+                day_quality = self._fetch_quality_data(date).get("day_quality")
+            day_override = day_overrides.get(date)
+
+            for exchange, streams in EXPECTED_STREAMS.items():
+                for stream in streams:
+                    for symbol in EXPECTED_SYMBOLS:
+                        partition_key = (date, exchange, stream, symbol)
+                        current_override = deepcopy(overrides.get(partition_key))
+
+                        if partition_key in artifacts:
+                            entry = availability_entry(
+                                AVAILABLE,
+                                retryable=False,
+                                reason_code=REASON_SUCCESS,
+                                updated_at=(current_override or {}).get("updated_at") or utc_now_iso(),
+                                artifacts=artifacts[partition_key],
+                            )
+                        elif current_override and current_override.get("availability") == PENDING:
+                            entry = current_override
+                        elif day_quality == "BAD" or day_override:
+                            entry = availability_entry(
+                                "unavailable",
+                                retryable=False,
+                                reason_code=REASON_QUALITY_BAD,
+                                updated_at=(current_override or day_override or {}).get("updated_at") or utc_now_iso(),
+                            )
+                        elif day_quality == "PARTIAL":
+                            entry = availability_entry(
+                                "unavailable",
+                                retryable=True,
+                                reason_code=REASON_QUALITY_PARTIAL,
+                                updated_at=(current_override or {}).get("updated_at") or utc_now_iso(),
+                            )
+                        elif partition_key in raw_parts:
+                            if current_override and current_override.get("reason_code") in {
+                                REASON_COMPACTION_QUARANTINED,
+                                REASON_RESOURCE_LIMIT,
+                                REASON_COMPACTION_FAILED,
+                            }:
+                                entry = current_override
+                            else:
+                                entry = availability_entry(
+                                    "unavailable",
+                                    retryable=True,
+                                    reason_code=REASON_ARTIFACT_MISSING,
+                                    updated_at=(current_override or {}).get("updated_at") or utc_now_iso(),
+                                )
+                        elif not raw_combo_dates.get((exchange, stream, symbol)):
+                            entry = availability_entry(
+                                "unavailable",
+                                retryable=False,
+                                reason_code=REASON_ALWAYS_MISSING_COMBO,
+                                updated_at=(current_override or {}).get("updated_at") or utc_now_iso(),
+                            )
+                        else:
+                            entry = availability_entry(
+                                "unavailable",
+                                retryable=True,
+                                reason_code=REASON_MISSING_RAW,
+                                updated_at=(current_override or {}).get("updated_at") or utc_now_iso(),
+                            )
+
+                        day["exchanges"][exchange]["streams"][stream]["symbols"][symbol] = entry
+
+            summarize_date(state, date)
+
+        state["updated_at"] = utc_now_iso()
+        recompute_progress(state)
+        if progress_seed and progress_seed in state.get("dates", {}):
+            current = state.get("progress", {}).get("last_complete_date")
+            if current is None or progress_seed > current:
+                state["progress"]["last_complete_date"] = progress_seed
+        return state
+
+    def sync_manifest_state(self, today: Optional[str] = None, force: bool = False) -> Dict[str, Any]:
+        today = today or get_today_date()
+        existing = self.state_manager._read_state()
+        if not is_v2_state(existing) or force:
+            manifest = self._build_manifest_state(existing, today)
+        else:
+            raw_parts = self._scan_raw_partitions_before(today)
+            artifacts = self._scan_compact_artifacts_before(today)
+            overrides = extract_state_overrides(existing)
+            all_dates = {date for date, _, _, _ in raw_parts}
+            all_dates.update(date for date, _, _, _ in artifacts)
+            all_dates.update(date for date, _, _, _ in overrides if date < today)
+            missing_dates = sorted(date for date in all_dates if date not in existing.get("dates", {}))
+            if not missing_dates:
+                self.state_manager.persist_state(existing)
+                return existing
+            rebuilt = self._build_manifest_state(existing, today)
+            manifest = rebuilt
+        self.state_manager.persist_state(manifest)
+        return manifest
         
     def compact_date_partition(
         self,
@@ -639,6 +907,7 @@ class CompactionJob:
                 
             result['status'] = 'success'
             self.state_manager.log_partition_status(result)
+            self.invalidate_manifest_caches(date)
             
             # Requested: [SUCCESS] symbol stream date | files_in=N | rows=... | merge=..s | up=..s
             s_tag = Colors.colorate("[SUCCESS]", Colors.GREEN)
