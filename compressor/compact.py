@@ -671,7 +671,7 @@ class CompactionJob:
                         else:
                             entry = availability_entry(
                                 "unavailable",
-                                retryable=True,
+                                retryable=False,
                                 reason_code=REASON_MISSING_RAW,
                                 updated_at=(current_override or {}).get("updated_at") or utc_now_iso(),
                             )

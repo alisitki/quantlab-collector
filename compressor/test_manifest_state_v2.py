@@ -59,7 +59,7 @@ class ManifestStateV2Test(unittest.TestCase):
         state = harness._build_manifest_state({}, "20260426")
         entry = get_entry(state, "20260425", "binance", "trade", "btcusdt")
         self.assertEqual(entry["availability"], "unavailable")
-        self.assertTrue(entry["retryable"])
+        self.assertFalse(entry["retryable"])
         self.assertEqual(entry["reason_code"], REASON_MISSING_RAW)
 
     def test_always_missing_combo_and_available_artifact_are_explicit(self):
